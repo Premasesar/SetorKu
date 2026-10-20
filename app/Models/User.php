@@ -30,6 +30,13 @@ class User extends Authenticatable
         ];
     }
 
+    // ------- Relasi -------
+
+    public function customer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Customer::class);
+    }
+
     // ------- Helper role -------
 
     public function isAdmin(): bool

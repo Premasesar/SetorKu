@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,7 +43,13 @@ Route::middleware('auth')->group(function () {
     // ─── Admin Routes ───────────────────────────────────────────
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
-        // PBI-02, PBI-03, PBI-04 routes akan ditambahkan di sini
+
+        // PBI-02: Pengelolaan Data Nasabah (tanpa hard delete)
+        Route::resource('nasabah', CustomerController::class)
+            ->parameters(['nasabah' => 'customer'])
+            ->except(['destroy']);
+        Route::patch('nasabah/{customer}/nonaktifkan', [CustomerController::class, 'deactivate'])
+            ->name('nasabah.deactivate');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────

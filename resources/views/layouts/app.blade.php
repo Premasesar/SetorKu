@@ -58,7 +58,12 @@
                     </li>
 
                     @if(auth()->user()->isAdmin())
-                        {{-- Menu Admin — PBI-02, PBI-03 akan ditambahkan di sini --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.nasabah.*') ? 'active' : '' }}" href="{{ route('admin.nasabah.index') }}">
+                                <i class="bi bi-people"></i> Data Nasabah
+                            </a>
+                        </li>
+                        {{-- Menu Admin — PBI-03 akan ditambahkan di sini --}}
                     @endif
 
                     @if(auth()->user()->isPetugas())
@@ -113,6 +118,13 @@
                                 <i class="bi bi-house-door"></i> Dashboard
                             </a>
                         </li>
+                        @if(auth()->user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.nasabah.index') }}">
+                                <i class="bi bi-people"></i> Data Nasabah
+                            </a>
+                        </li>
+                        @endif
                         @endauth
                     </ul>
                     @auth

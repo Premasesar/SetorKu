@@ -20,7 +20,7 @@
                 <i class="bi bi-people fs-1 text-success"></i>
                 <h6 class="mt-2">Data Nasabah</h6>
                 <p class="text-muted small">Kelola nasabah bank sampah</p>
-                {{-- Link akan aktif setelah PBI-02 --}}
+                <a href="{{ route('admin.nasabah.index') }}" class="btn btn-sm btn-success">Buka</a>
             </div>
         </div>
     </div>
