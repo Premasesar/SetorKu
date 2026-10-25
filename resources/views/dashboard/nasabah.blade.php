@@ -61,6 +61,41 @@
     </div>
 </div>
 
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-truck"></i> Status Penjemputan Aktif Terakhir</span>
+        @if(isset($customer) && $customer)
+            <a href="{{ route('nasabah.penjemputan.create') }}" class="btn btn-sm btn-success">
+                <i class="bi bi-plus-circle"></i> Ajukan Penjemputan
+            </a>
+        @endif
+    </div>
+    <div class="card-body">
+        @if(!empty($activePickup))
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <code>{{ $activePickup->code }}</code>
+                    <span class="badge {{ $activePickup->statusBadgeClass() }} ms-1">{{ $activePickup->statusLabel() }}</span>
+                    <div class="small text-muted mt-1">
+                        Diajukan: {{ $activePickup->requested_date?->format('d-m-Y') }}
+                        @if($activePickup->scheduled_date)
+                            | Jadwal Jemput: <strong>{{ $activePickup->scheduled_date->format('d-m-Y') }}</strong>
+                        @endif
+                        @if($activePickup->officer)
+                            | Petugas: {{ $activePickup->officer->name }}
+                        @endif
+                    </div>
+                </div>
+                <a href="{{ route('nasabah.penjemputan.show', $activePickup) }}" class="btn btn-sm btn-outline-primary">
+                    Lihat Detail
+                </a>
+            </div>
+        @else
+            <p class="text-muted mb-0">Tidak ada pengajuan penjemputan yang sedang menunggu atau terjadwal.</p>
+        @endif
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <span class="fw-semibold"><i class="bi bi-clock-history"></i> 5 Transaksi Terakhir</span>

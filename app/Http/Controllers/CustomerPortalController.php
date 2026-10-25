@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateCustomerProfileRequest;
 use App\Models\Customer;
 use App\Models\Deposit;
+use App\Models\PickupRequest;
 use App\Models\Withdrawal;
 use App\Services\CustomerPortalService;
 use Illuminate\Http\Request;
@@ -34,11 +35,18 @@ class CustomerPortalController extends Controller
         $totalDeposits = $customer !== null ? (float) $customer->deposits()->sum('total_value') : 0.0;
         $totalWithdrawals = $customer !== null ? (float) $customer->withdrawals()->sum('amount') : 0.0;
 
+        $activePickup = $customer?->pickupRequests()
+            ->with('officer')
+            ->whereIn('status', [PickupRequest::STATUS_MENUNGGU, PickupRequest::STATUS_TERJADWAL])
+            ->latest('id')
+            ->first();
+
         return view('dashboard.nasabah', compact(
             'customer',
             'recentTransactions',
             'totalDeposits',
             'totalWithdrawals',
+            'activePickup',
         ));
     }
 

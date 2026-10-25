@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\OfficerPickupController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WasteTypeController;
 use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
@@ -102,6 +103,10 @@ Route::middleware('auth')->group(function () {
             ->name('penjemputan.schedule');
         Route::patch('penjemputan/{pickupRequest}/ubah-jadwal', [AdminPickupController::class, 'reschedule'])
             ->name('penjemputan.reschedule');
+
+        // PBI-10: Laporan Rekap Bulanan (khusus Admin)
+        Route::get('laporan', [ReportController::class, 'index'])
+            ->name('laporan.index');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────
