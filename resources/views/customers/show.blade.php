@@ -59,6 +59,9 @@
                     <dt class="col-sm-4">Email (akun login)</dt>
                     <dd class="col-sm-8">{{ $customer->user?->email ?? '-' }}</dd>
 
+                    <dt class="col-sm-4">No. HP</dt>
+                    <dd class="col-sm-8">{{ $customer->phone ?: '-' }}</dd>
+
                     <dt class="col-sm-4">Alamat</dt>
                     <dd class="col-sm-8">{!! nl2br(e($customer->address)) !!}</dd>
 

@@ -26,6 +26,7 @@ class CustomerFactory extends Factory
             ]),
             'name' => $name,
             'address' => fake()->streetAddress() . ', Yogyakarta',
+            'phone' => fake()->numerify('08##########'),
             'latitude' => fake()->latitude(-7.8400000, -7.7500000),
             'longitude' => fake()->longitude(110.3300000, 110.4100000),
             'balance' => 0,

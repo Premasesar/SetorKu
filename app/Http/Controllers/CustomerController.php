@@ -60,6 +60,7 @@ class CustomerController extends Controller
             return $user->customer()->create([
                 'name' => $data['name'],
                 'address' => $data['address'],
+                'phone' => $data['phone'] ?? null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
             ]);
@@ -96,6 +97,7 @@ class CustomerController extends Controller
             $customer->update([
                 'name' => $data['name'],
                 'address' => $data['address'],
+                'phone' => $data['phone'] ?? null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
             ]);

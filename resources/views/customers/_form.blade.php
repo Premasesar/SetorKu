@@ -24,6 +24,14 @@
     @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
+<div class="mb-3">
+    <label for="phone" class="form-label">No. HP <small class="text-muted">(opsional)</small></label>
+    <input type="text" id="phone" name="phone" maxlength="30" placeholder="081234567890"
+           class="form-control @error('phone') is-invalid @enderror"
+           value="{{ old('phone', $customer->phone ?? '') }}">
+    @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+</div>
+
 <div class="row g-3 mb-3">
     <div class="col-md-6">
         <label for="latitude" class="form-label">Latitude <small class="text-muted">(opsional)</small></label>

@@ -104,7 +104,16 @@
                     @endif
 
                     @if(auth()->user()->isNasabah())
-                        {{-- Menu Nasabah — Portal akan ditambahkan di Sprint 2 --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('nasabah.riwayat.*') ? 'active' : '' }}" href="{{ route('nasabah.riwayat.index') }}">
+                                <i class="bi bi-clock-history"></i> Riwayat Transaksi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('nasabah.profil.*') ? 'active' : '' }}" href="{{ route('nasabah.profil.edit') }}">
+                                <i class="bi bi-person-gear"></i> Profil Saya
+                            </a>
+                        </li>
                     @endif
                 @endauth
             </ul>
@@ -192,6 +201,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('petugas.penarikan.index') }}">
                                 <i class="bi bi-arrow-up-circle"></i> Penarikan Saldo
+                            </a>
+                        </li>
+                        @endif
+                        @if(auth()->user()->isNasabah())
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('nasabah.riwayat.index') }}">
+                                <i class="bi bi-clock-history"></i> Riwayat Transaksi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('nasabah.profil.edit') }}">
+                                <i class="bi bi-person-gear"></i> Profil Saya
                             </a>
                         </li>
                         @endif

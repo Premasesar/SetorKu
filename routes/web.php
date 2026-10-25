@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerPortalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\WasteTypeController;
@@ -103,6 +104,12 @@ Route::middleware('auth')->group(function () {
     // ─── Nasabah Routes ─────────────────────────────────────────
     Route::middleware('role:nasabah')->prefix('nasabah')->name('nasabah.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'nasabah'])->name('dashboard');
-        // Portal nasabah routes akan ditambahkan di Sprint 2
+
+        // PBI-06: Portal Nasabah (riwayat gabungan & profil mandiri)
+        Route::get('/riwayat', [CustomerPortalController::class, 'transactions'])->name('riwayat.index');
+        Route::get('/riwayat/setoran/{deposit}', [CustomerPortalController::class, 'showDeposit'])->name('riwayat.deposit');
+        Route::get('/riwayat/penarikan/{withdrawal}', [CustomerPortalController::class, 'showWithdrawal'])->name('riwayat.withdrawal');
+        Route::get('/profil', [CustomerPortalController::class, 'editProfile'])->name('profil.edit');
+        Route::put('/profil', [CustomerPortalController::class, 'updateProfile'])->name('profil.update');
     });
 });
