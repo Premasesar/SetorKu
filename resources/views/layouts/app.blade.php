@@ -63,7 +63,11 @@
                                 <i class="bi bi-people"></i> Data Nasabah
                             </a>
                         </li>
-                        {{-- Menu Admin — PBI-03 akan ditambahkan di sini --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.jenis-sampah.*') ? 'active' : '' }}" href="{{ route('admin.jenis-sampah.index') }}">
+                                <i class="bi bi-tags"></i> Jenis & Harga Sampah
+                            </a>
+                        </li>
                     @endif
 
                     @if(auth()->user()->isPetugas())
@@ -72,7 +76,11 @@
                                 <i class="bi bi-people"></i> Data Nasabah
                             </a>
                         </li>
-                        {{-- Menu Petugas — PBI-03, PBI-04 akan ditambahkan di sini --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('petugas.jenis-sampah.*') ? 'active' : '' }}" href="{{ route('petugas.jenis-sampah.index') }}">
+                                <i class="bi bi-tags"></i> Jenis & Harga Sampah
+                            </a>
+                        </li>
                     @endif
 
                     @if(auth()->user()->isNasabah())
@@ -129,11 +137,21 @@
                                 <i class="bi bi-people"></i> Data Nasabah
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.jenis-sampah.index') }}">
+                                <i class="bi bi-tags"></i> Jenis & Harga Sampah
+                            </a>
+                        </li>
                         @endif
                         @if(auth()->user()->isPetugas())
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('petugas.nasabah.index') }}">
                                 <i class="bi bi-people"></i> Data Nasabah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('petugas.jenis-sampah.index') }}">
+                                <i class="bi bi-tags"></i> Jenis & Harga Sampah
                             </a>
                         </li>
                         @endif

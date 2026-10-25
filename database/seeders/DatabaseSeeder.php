@@ -68,6 +68,8 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        $this->command?->info('Selesai seed akun & 11 nasabah Yogyakarta.');
+        $this->call(WasteTypeSeeder::class);
+
+        $this->command?->info('Selesai seed akun, 11 nasabah Yogyakarta, dan jenis sampah.');
     }
 }

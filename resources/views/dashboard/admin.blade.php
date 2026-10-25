@@ -30,7 +30,7 @@
                 <i class="bi bi-tags fs-1 text-primary"></i>
                 <h6 class="mt-2">Jenis & Harga Sampah</h6>
                 <p class="text-muted small">Kelola tarif harga sampah</p>
-                {{-- Link akan aktif setelah PBI-03 --}}
+                <a href="{{ route('admin.jenis-sampah.index') }}" class="btn btn-sm btn-primary">Buka</a>
             </div>
         </div>
     </div>
