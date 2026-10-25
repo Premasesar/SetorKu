@@ -17,6 +17,7 @@ class Deposit extends Model
         'customer_id',
         'waste_type_id',
         'officer_id',
+        'pickup_request_id',
         'weight',
         'price_per_unit',
         'total_value',
@@ -44,6 +45,11 @@ class Deposit extends Model
     public function officer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'officer_id');
+    }
+
+    public function pickupRequest(): BelongsTo
+    {
+        return $this->belongsTo(PickupRequest::class);
     }
 
     public function getCodeAttribute(): string

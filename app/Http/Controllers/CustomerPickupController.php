@@ -53,7 +53,7 @@ class CustomerPickupController extends Controller
 
         abort_unless((int) $pickupRequest->customer_id === (int) $customer->id, 403);
 
-        $pickupRequest->load(['customer', 'officer', 'scheduler']);
+        $pickupRequest->load(['customer', 'officer', 'scheduler', 'deposits.wasteType']);
 
         return view('pickups.nasabah.show', compact('pickupRequest'));
     }

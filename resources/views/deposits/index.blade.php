@@ -54,7 +54,12 @@
                     <tbody>
                         @foreach($deposits as $deposit)
                             <tr>
-                                <td><code>{{ $deposit->code }}</code></td>
+                                <td>
+                                    <code>{{ $deposit->code }}</code>
+                                    @if($deposit->pickupRequest)
+                                        <br><span class="badge bg-info text-dark">Dari penjemputan {{ $deposit->pickupRequest->code }}</span>
+                                    @endif
+                                </td>
                                 <td>{{ $deposit->created_at?->format('d-m-Y H:i') }}</td>
                                 <td>
                                     {{ $deposit->customer?->name }}

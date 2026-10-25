@@ -201,6 +201,44 @@
     </div>
 @endif
 
+@if($pickupRequest->deposits->isNotEmpty())
+    <div class="card shadow-sm mt-3">
+        <div class="card-header bg-white fw-semibold">
+            <i class="bi bi-receipt"></i> Daftar Bukti Setoran Hasil Penjemputan
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Kode Setoran</th>
+                            <th>Jenis Sampah</th>
+                            <th class="text-end">Berat</th>
+                            <th class="text-end">Harga Snapshot</th>
+                            <th class="text-end">Total Nilai</th>
+                            <th class="text-end">Bukti</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pickupRequest->deposits as $deposit)
+                            <tr>
+                                <td><code>{{ $deposit->code }}</code></td>
+                                <td>{{ $deposit->wasteType?->name }}</td>
+                                <td class="text-end">{{ number_format($deposit->weight, 3, ',', '.') }} {{ $deposit->wasteType?->unit }}</td>
+                                <td class="text-end">Rp {{ number_format($deposit->price_per_unit, 2, ',', '.') }}</td>
+                                <td class="text-end fw-semibold text-success">Rp {{ number_format($deposit->total_value, 2, ',', '.') }}</td>
+                                <td class="text-end">
+                                    <a href="{{ route('admin.setoran.show', $deposit) }}" class="btn btn-sm btn-outline-primary">Bukti</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+@endif
+
 <a href="{{ route('admin.penjemputan.index') }}" class="btn btn-link mt-3 px-0"><i class="bi bi-arrow-left"></i> Kembali ke daftar penjemputan</a>
 @endsection
 

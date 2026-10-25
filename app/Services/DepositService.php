@@ -10,15 +10,21 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Layanan transaksi setoran sampah — PBI-04 / FR-004 / BR-003.
+ * Layanan transaksi setoran sampah — PBI-04 & PBI-09 / FR-004 / BR-003.
  *
  * Seluruh kalkulasi harga & penambahan saldo dilakukan atomik di backend
  * dengan DB::transaction + lockForUpdate pada baris nasabah.
+ * Mendukung pencatatan setoran langsung maupun hasil penjemputan (pickup_request_id).
  */
 class DepositService
 {
-    public function recordDeposit(int $customerId, int $wasteTypeId, float|string $weight, User $officer): Deposit
-    {
+    public function recordDeposit(
+        int $customerId,
+        int $wasteTypeId,
+        float|string $weight,
+        User $officer,
+        ?int $pickupRequestId = null,
+    ): Deposit {
         abort_unless($officer->isPetugas(), 403);
 
         $weightNum = round((float) $weight, 3);
@@ -28,7 +34,7 @@ class DepositService
             ]);
         }
 
-        return DB::transaction(function () use ($customerId, $wasteTypeId, $weightNum, $officer) {
+        return DB::transaction(function () use ($customerId, $wasteTypeId, $weightNum, $officer, $pickupRequestId) {
             $customer = Customer::whereKey($customerId)->lockForUpdate()->first();
 
             if ($customer === null || ! $customer->is_active) {
@@ -52,6 +58,7 @@ class DepositService
                 'customer_id' => $customer->id,
                 'waste_type_id' => $wasteType->id,
                 'officer_id' => $officer->id,
+                'pickup_request_id' => $pickupRequestId,
                 'weight' => $weightNum,
                 'price_per_unit' => $pricePerUnit,
                 'total_value' => $totalValue,

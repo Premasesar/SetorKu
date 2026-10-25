@@ -21,7 +21,12 @@
     <div class="card-body">
         <dl class="row mb-0">
             <dt class="col-sm-5">Kode Transaksi</dt>
-            <dd class="col-sm-7"><code>{{ $deposit->code }}</code></dd>
+            <dd class="col-sm-7">
+                <code>{{ $deposit->code }}</code>
+                @if($deposit->pickupRequest)
+                    <span class="badge bg-info text-dark ms-1">Dari penjemputan {{ $deposit->pickupRequest->code }}</span>
+                @endif
+            </dd>
 
             <dt class="col-sm-5">Waktu Transaksi</dt>
             <dd class="col-sm-7">{{ $deposit->created_at?->format('d-m-Y H:i:s') }}</dd>
