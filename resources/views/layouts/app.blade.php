@@ -64,6 +64,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.petugas.*') ? 'active' : '' }}" href="{{ route('admin.petugas.index') }}">
+                                <i class="bi bi-person-badge"></i> Kelola Petugas
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.jenis-sampah.*') ? 'active' : '' }}" href="{{ route('admin.jenis-sampah.index') }}">
                                 <i class="bi bi-tags"></i> Jenis & Harga Sampah
                             </a>
@@ -164,6 +169,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('admin.nasabah.index') }}">
                                 <i class="bi bi-people"></i> Data Nasabah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.petugas.index') }}">
+                                <i class="bi bi-person-badge"></i> Kelola Petugas
                             </a>
                         </li>
                         <li class="nav-item">
