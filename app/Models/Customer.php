@@ -50,6 +50,22 @@ class Customer extends Model
         return $this->hasMany(Deposit::class);
     }
 
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
+    /**
+     * Hitung saldo teoritis dari selisih total setoran dikurangi total penarikan.
+     */
+    public function calculatedBalance(): float
+    {
+        $totalDeposits = (float) $this->deposits()->sum('total_value');
+        $totalWithdrawals = (float) $this->withdrawals()->sum('amount');
+
+        return round($totalDeposits - $totalWithdrawals, 2);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
