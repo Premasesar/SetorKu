@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepositController;
 use App\Http\Controllers\WasteTypeController;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +63,11 @@ Route::middleware('auth')->group(function () {
             ->name('jenis-sampah.deactivate');
         Route::patch('jenis-sampah/{wasteType}/aktifkan', [WasteTypeController::class, 'activate'])
             ->name('jenis-sampah.activate');
+
+        // PBI-04: Admin hanya melihat riwayat dan bukti setoran
+        Route::resource('setoran', DepositController::class)
+            ->parameters(['setoran' => 'deposit'])
+            ->only(['index', 'show']);
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────
@@ -76,6 +82,11 @@ Route::middleware('auth')->group(function () {
         // PBI-03: Petugas hanya boleh melihat jenis sampah aktif
         Route::get('jenis-sampah', [WasteTypeController::class, 'index'])
             ->name('jenis-sampah.index');
+
+        // PBI-04: Petugas mencatat setoran & melihat riwayat/bukti setoran
+        Route::resource('setoran', DepositController::class)
+            ->parameters(['setoran' => 'deposit'])
+            ->only(['index', 'create', 'store', 'show']);
     });
 
     // ─── Nasabah Routes ─────────────────────────────────────────
