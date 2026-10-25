@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerPickupController;
 use App\Http\Controllers\CustomerPortalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
@@ -123,5 +124,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/riwayat/penarikan/{withdrawal}', [CustomerPortalController::class, 'showWithdrawal'])->name('riwayat.withdrawal');
         Route::get('/profil', [CustomerPortalController::class, 'editProfile'])->name('profil.edit');
         Route::put('/profil', [CustomerPortalController::class, 'updateProfile'])->name('profil.update');
+
+        // PBI-07: Pengajuan Penjemputan Sampah (Nasabah)
+        Route::resource('penjemputan', CustomerPickupController::class)
+            ->parameters(['penjemputan' => 'pickupRequest'])
+            ->only(['index', 'create', 'store', 'show']);
     });
 });

@@ -56,6 +56,11 @@ class Customer extends Model
         return $this->hasMany(Withdrawal::class);
     }
 
+    public function pickupRequests(): HasMany
+    {
+        return $this->hasMany(PickupRequest::class);
+    }
+
     /**
      * Hitung saldo teoritis dari selisih total setoran dikurangi total penarikan.
      */
