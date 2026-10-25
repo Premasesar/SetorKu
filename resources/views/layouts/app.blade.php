@@ -98,6 +98,11 @@
                                 <i class="bi bi-journal-text"></i> Laporan Bulanan
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.dampak.*') ? 'active' : '' }}" href="{{ route('admin.dampak.index') }}">
+                                <i class="bi bi-bar-chart-line"></i> Dampak
+                            </a>
+                        </li>
                     @endif
 
                     @if(auth()->user()->isPetugas())
@@ -234,6 +239,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('admin.laporan.index') }}">
                                 <i class="bi bi-journal-text"></i> Laporan Bulanan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.dampak.index') }}">
+                                <i class="bi bi-bar-chart-line"></i> Dampak
                             </a>
                         </li>
                         @endif

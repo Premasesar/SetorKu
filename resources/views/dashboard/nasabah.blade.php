@@ -64,6 +64,24 @@
     </div>
 </div>
 
+<div class="card border-success shadow-sm mb-4">
+    <div class="card-header bg-success-subtle text-success fw-semibold">
+        <i class="bi bi-recycle"></i> Kontribusi saya
+    </div>
+    <div class="card-body">
+        <div class="row g-3 text-center text-md-start">
+            <div class="col-md-6">
+                <div class="text-muted small">Total Berat Sampah Disetor</div>
+                <h4 class="fw-bold text-success mb-0">{{ number_format($totalWeightKg ?? 0, 3, ',', '.') }} kg</h4>
+            </div>
+            <div class="col-md-6">
+                <div class="text-muted small">Jumlah Setoran</div>
+                <h4 class="fw-bold mb-0">{{ $depositsCount ?? 0 }} setoran</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <span class="fw-semibold"><i class="bi bi-truck"></i> Status Penjemputan Aktif Terakhir</span>

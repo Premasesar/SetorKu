@@ -34,6 +34,8 @@ class CustomerPortalController extends Controller
 
         $totalDeposits = $customer !== null ? (float) $customer->deposits()->sum('total_value') : 0.0;
         $totalWithdrawals = $customer !== null ? (float) $customer->withdrawals()->sum('amount') : 0.0;
+        $totalWeightKg = $customer !== null ? round((float) $customer->deposits()->sum('weight'), 3) : 0.0;
+        $depositsCount = $customer !== null ? (int) $customer->deposits()->count() : 0;
 
         $activePickup = $customer?->pickupRequests()
             ->with('officer')
@@ -46,6 +48,8 @@ class CustomerPortalController extends Controller
             'recentTransactions',
             'totalDeposits',
             'totalWithdrawals',
+            'totalWeightKg',
+            'depositsCount',
             'activePickup',
         ));
     }
