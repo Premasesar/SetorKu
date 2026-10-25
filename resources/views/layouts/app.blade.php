@@ -73,6 +73,11 @@
                                 <i class="bi bi-arrow-down-circle"></i> Riwayat Setoran
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.penarikan.*') ? 'active' : '' }}" href="{{ route('admin.penarikan.index') }}">
+                                <i class="bi bi-arrow-up-circle"></i> Riwayat Penarikan
+                            </a>
+                        </li>
                     @endif
 
                     @if(auth()->user()->isPetugas())
@@ -89,6 +94,11 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('petugas.setoran.*') ? 'active' : '' }}" href="{{ route('petugas.setoran.index') }}">
                                 <i class="bi bi-arrow-down-circle"></i> Setoran Sampah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('petugas.penarikan.*') ? 'active' : '' }}" href="{{ route('petugas.penarikan.index') }}">
+                                <i class="bi bi-arrow-up-circle"></i> Penarikan Saldo
                             </a>
                         </li>
                     @endif
@@ -157,6 +167,11 @@
                                 <i class="bi bi-arrow-down-circle"></i> Riwayat Setoran
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.penarikan.index') }}">
+                                <i class="bi bi-arrow-up-circle"></i> Riwayat Penarikan
+                            </a>
+                        </li>
                         @endif
                         @if(auth()->user()->isPetugas())
                         <li class="nav-item">
@@ -172,6 +187,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('petugas.setoran.index') }}">
                                 <i class="bi bi-arrow-down-circle"></i> Setoran Sampah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('petugas.penarikan.index') }}">
+                                <i class="bi bi-arrow-up-circle"></i> Penarikan Saldo
                             </a>
                         </li>
                         @endif

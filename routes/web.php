@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\WasteTypeController;
+use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -68,6 +69,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('setoran', DepositController::class)
             ->parameters(['setoran' => 'deposit'])
             ->only(['index', 'show']);
+
+        // PBI-05: Admin hanya melihat riwayat dan bukti penarikan
+        Route::resource('penarikan', WithdrawalController::class)
+            ->parameters(['penarikan' => 'withdrawal'])
+            ->only(['index', 'show']);
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────
@@ -86,6 +92,11 @@ Route::middleware('auth')->group(function () {
         // PBI-04: Petugas mencatat setoran & melihat riwayat/bukti setoran
         Route::resource('setoran', DepositController::class)
             ->parameters(['setoran' => 'deposit'])
+            ->only(['index', 'create', 'store', 'show']);
+
+        // PBI-05: Petugas mencatat penarikan & melihat riwayat/bukti penarikan
+        Route::resource('penarikan', WithdrawalController::class)
+            ->parameters(['penarikan' => 'withdrawal'])
             ->only(['index', 'create', 'store', 'show']);
     });
 
