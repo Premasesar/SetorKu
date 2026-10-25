@@ -17,7 +17,10 @@
         </p>
     </div>
     @if(isset($customer) && $customer)
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('nasabah.kartu.show') }}" class="btn btn-success">
+                <i class="bi bi-qr-code"></i> Kartu Saya
+            </a>
             <a href="{{ route('nasabah.riwayat.index') }}" class="btn btn-outline-success">
                 <i class="bi bi-clock-history"></i> Riwayat Lengkap
             </a>

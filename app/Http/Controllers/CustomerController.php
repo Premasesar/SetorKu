@@ -80,6 +80,17 @@ class CustomerController extends Controller
         return view('customers.show', compact('customer'));
     }
 
+    public function card(Request $request, Customer $customer)
+    {
+        abort_unless($request->user()?->isAdmin() || $request->user()?->isPetugas(), 403);
+
+        return view('customers.card', [
+            'customer' => $customer,
+            'pageTitle' => 'Cetak Kartu Nasabah',
+            'backUrl' => route($request->user()->isAdmin() ? 'admin.nasabah.show' : 'petugas.nasabah.show', $customer),
+        ]);
+    }
+
     public function edit(Request $request, Customer $customer)
     {
         abort_unless($request->user()?->isAdmin(), 403);

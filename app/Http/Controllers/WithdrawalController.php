@@ -69,6 +69,10 @@ class WithdrawalController extends Controller
             ->limit(100)
             ->get();
 
+        if ($selectedCustomerId === null && $customerSearch !== '' && $customers->count() === 1) {
+            $selectedCustomerId = $customers->first()->id;
+        }
+
         return view('withdrawals.create', compact(
             'customers',
             'customerSearch',

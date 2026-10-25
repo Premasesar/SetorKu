@@ -140,6 +140,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('nasabah.kartu.*') ? 'active' : '' }}" href="{{ route('nasabah.kartu.show') }}">
+                                <i class="bi bi-qr-code"></i> Kartu Saya
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('nasabah.profil.*') ? 'active' : '' }}" href="{{ route('nasabah.profil.edit') }}">
                                 <i class="bi bi-person-gear"></i> Profil Saya
                             </a>
@@ -268,6 +273,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('nasabah.riwayat.index') }}">
                                 <i class="bi bi-clock-history"></i> Riwayat Transaksi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('nasabah.kartu.show') }}">
+                                <i class="bi bi-qr-code"></i> Kartu Saya
                             </a>
                         </li>
                         <li class="nav-item">

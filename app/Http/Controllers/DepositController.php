@@ -72,6 +72,10 @@ class DepositController extends Controller
             ->limit(100)
             ->get();
 
+        if ($selectedCustomerId === null && $customerSearch !== '' && $customers->count() === 1) {
+            $selectedCustomerId = $customers->first()->id;
+        }
+
         $wasteTypes = WasteType::active()->orderBy('name')->get();
 
         return view('deposits.create', compact(
