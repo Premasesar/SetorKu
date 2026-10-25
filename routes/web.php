@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WasteTypeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +53,15 @@ Route::middleware('auth')->group(function () {
             ->name('nasabah.deactivate');
         Route::patch('nasabah/{customer}/aktifkan', [CustomerController::class, 'activate'])
             ->name('nasabah.activate');
+
+        // PBI-03: Pengelolaan Jenis Sampah & Harga (tanpa hard delete)
+        Route::resource('jenis-sampah', WasteTypeController::class)
+            ->parameters(['jenis-sampah' => 'wasteType'])
+            ->except(['destroy']);
+        Route::patch('jenis-sampah/{wasteType}/nonaktifkan', [WasteTypeController::class, 'deactivate'])
+            ->name('jenis-sampah.deactivate');
+        Route::patch('jenis-sampah/{wasteType}/aktifkan', [WasteTypeController::class, 'activate'])
+            ->name('jenis-sampah.activate');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────
@@ -62,6 +72,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('nasabah', CustomerController::class)
             ->parameters(['nasabah' => 'customer'])
             ->only(['index', 'create', 'store', 'show']);
+
+        // PBI-03: Petugas hanya boleh melihat jenis sampah aktif
+        Route::get('jenis-sampah', [WasteTypeController::class, 'index'])
+            ->name('jenis-sampah.index');
     });
 
     // ─── Nasabah Routes ─────────────────────────────────────────
