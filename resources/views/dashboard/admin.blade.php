@@ -13,9 +13,8 @@
 </div>
 
 <div class="row g-3">
-    {{-- Placeholder cards — akan diisi statistik di Sprint 2/3 --}}
-    <div class="col-md-4">
-        <div class="card border-success">
+    <div class="col-md-3">
+        <div class="card border-success h-100">
             <div class="card-body text-center">
                 <i class="bi bi-people fs-1 text-success"></i>
                 <h6 class="mt-2">Data Nasabah</h6>
@@ -24,8 +23,18 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card border-primary">
+    <div class="col-md-3">
+        <div class="card border-info h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-person-badge fs-1 text-info"></i>
+                <h6 class="mt-2">Kelola Petugas</h6>
+                <p class="text-muted small">Kelola akun petugas lapangan</p>
+                <a href="{{ route('admin.petugas.index') }}" class="btn btn-sm btn-info text-white">Buka</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-primary h-100">
             <div class="card-body text-center">
                 <i class="bi bi-tags fs-1 text-primary"></i>
                 <h6 class="mt-2">Jenis & Harga Sampah</h6>
@@ -34,8 +43,8 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card border-warning">
+    <div class="col-md-3">
+        <div class="card border-warning h-100">
             <div class="card-body text-center">
                 <i class="bi bi-journal-text fs-1 text-warning"></i>
                 <h6 class="mt-2">Laporan</h6>

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -13,8 +15,13 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'role',
+    ];
+
+    protected $attributes = [
+        'is_active' => true,
     ];
 
     protected $hidden = [
@@ -27,17 +34,34 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
     // ------- Relasi -------
 
-    public function customer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function customer(): HasOne
     {
         return $this->hasOne(Customer::class);
     }
 
-    // ------- Helper role -------
+    // ------- Scopes -------
+
+    public function scopeOfficers(Builder $query): Builder
+    {
+        return $query->where('role', 'petugas');
+    }
+
+    /**
+     * Pilihan petugas aktif (dipakai untuk penjadwalan penjemputan, dll).
+     * Petugas nonaktif tidak muncul di daftar ini.
+     */
+    public function scopeActiveOfficers(Builder $query): Builder
+    {
+        return $query->where('role', 'petugas')->where('is_active', true);
+    }
+
+    // ------- Helper role & kode -------
 
     public function isAdmin(): bool
     {
@@ -54,13 +78,27 @@ class User extends Authenticatable
         return $this->role === 'nasabah';
     }
 
+    public function getOfficerCodeAttribute(): string
+    {
+        return sprintf('PTG-%04d', $this->id);
+    }
+
     /**
      * Periksa apakah akun aktif.
-     * Menggunakan field customers.is_active untuk akun berperan nasabah.
+     * - Petugas: memeriksa kolom users.is_active.
+     * - Nasabah: memeriksa kolom users.is_active serta customers.is_active (bila profil tersedia).
      */
     public function isActiveAccount(): bool
     {
+        if ($this->isPetugas()) {
+            return (bool) $this->is_active;
+        }
+
         if ($this->isNasabah()) {
+            if (! $this->is_active) {
+                return false;
+            }
+
             $customer = $this->relationLoaded('customer')
                 ? $this->customer
                 : $this->customer()->first();

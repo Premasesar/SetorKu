@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPortalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\WasteTypeController;
 use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +76,17 @@ Route::middleware('auth')->group(function () {
         Route::resource('penarikan', WithdrawalController::class)
             ->parameters(['penarikan' => 'withdrawal'])
             ->only(['index', 'show']);
+
+        // PBI-06b: Kelola Petugas (khusus akun ber-role petugas, tanpa hard delete)
+        Route::resource('petugas', OfficerController::class)
+            ->parameters(['petugas' => 'officer'])
+            ->except(['destroy']);
+        Route::patch('petugas/{officer}/reset-password', [OfficerController::class, 'resetPassword'])
+            ->name('petugas.reset-password');
+        Route::patch('petugas/{officer}/nonaktifkan', [OfficerController::class, 'deactivate'])
+            ->name('petugas.deactivate');
+        Route::patch('petugas/{officer}/aktifkan', [OfficerController::class, 'activate'])
+            ->name('petugas.activate');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────

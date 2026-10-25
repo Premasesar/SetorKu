@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Memastikan sesi aktif milik akun yang dinonaktifkan langsung logout otomatis.
+ * Memastikan sesi aktif milik akun yang dinonaktifkan (nasabah maupun petugas)
+ * langsung logout otomatis pada request berikutnya.
  */
 class EnsureAccountIsActive
 {
@@ -16,14 +17,18 @@ class EnsureAccountIsActive
     {
         $user = $request->user();
 
-        if ($user && ! $user->isActiveAccount()) {
-            Auth::guard('web')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+        if ($user !== null) {
+            $currentUser = $user->fresh() ?? $user;
 
-            return redirect()->route('login')->withErrors([
-                'email' => 'Akun dinonaktifkan. Hubungi admin.',
-            ]);
+            if (! $currentUser->isActiveAccount()) {
+                Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('login')->withErrors([
+                    'email' => 'Akun dinonaktifkan. Hubungi admin.',
+                ]);
+            }
         }
 
         return $next($request);
