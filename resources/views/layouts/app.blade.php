@@ -110,6 +110,11 @@
 
                     @if(auth()->user()->isNasabah())
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('nasabah.penjemputan.*') ? 'active' : '' }}" href="{{ route('nasabah.penjemputan.index') }}">
+                                <i class="bi bi-truck"></i> Penjemputan Sampah
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('nasabah.riwayat.*') ? 'active' : '' }}" href="{{ route('nasabah.riwayat.index') }}">
                                 <i class="bi bi-clock-history"></i> Riwayat Transaksi
                             </a>
@@ -215,6 +220,11 @@
                         </li>
                         @endif
                         @if(auth()->user()->isNasabah())
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('nasabah.penjemputan.index') }}">
+                                <i class="bi bi-truck"></i> Penjemputan Sampah
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('nasabah.riwayat.index') }}">
                                 <i class="bi bi-clock-history"></i> Riwayat Transaksi
