@@ -32,8 +32,8 @@ class DashboardController extends Controller
     /**
      * Dashboard Nasabah — portal utama nasabah setelah login.
      */
-    public function nasabah()
+    public function nasabah(Request $request, CustomerPortalController $portalController)
     {
-        return view('dashboard.nasabah');
+        return $portalController->dashboard($request);
     }
 }

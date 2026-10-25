@@ -22,6 +22,7 @@ abstract class CustomerRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:1000'],
+            'phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+\-\s()]+$/'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90', 'required_with:longitude'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180', 'required_with:latitude'],
         ];
@@ -32,6 +33,7 @@ abstract class CustomerRequest extends FormRequest
         return [
             'name' => 'nama',
             'address' => 'alamat',
+            'phone' => 'nomor HP',
             'latitude' => 'latitude',
             'longitude' => 'longitude',
             'email' => 'email',
@@ -52,6 +54,7 @@ abstract class CustomerRequest extends FormRequest
             'between' => 'Kolom :attribute harus bernilai antara :min sampai :max.',
             'confirmed' => 'Konfirmasi :attribute tidak cocok.',
             'required_with' => 'Kolom :attribute wajib diisi jika :values diisi.',
+            'regex' => 'Format :attribute tidak valid.',
         ];
     }
 }
