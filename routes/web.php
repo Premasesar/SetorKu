@@ -44,18 +44,24 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
 
-        // PBI-02: Pengelolaan Data Nasabah (tanpa hard delete)
+        // PBI-02 & PBI-02b: Pengelolaan Data Nasabah (tanpa hard delete)
         Route::resource('nasabah', CustomerController::class)
             ->parameters(['nasabah' => 'customer'])
             ->except(['destroy']);
         Route::patch('nasabah/{customer}/nonaktifkan', [CustomerController::class, 'deactivate'])
             ->name('nasabah.deactivate');
+        Route::patch('nasabah/{customer}/aktifkan', [CustomerController::class, 'activate'])
+            ->name('nasabah.activate');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────
     Route::middleware('role:petugas')->prefix('petugas')->name('petugas.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'petugas'])->name('dashboard');
-        // PBI-02, PBI-04 routes akan ditambahkan di sini
+
+        // PBI-02b: Petugas hanya boleh melihat/mencari daftar, detail, dan menambah nasabah baru
+        Route::resource('nasabah', CustomerController::class)
+            ->parameters(['nasabah' => 'customer'])
+            ->only(['index', 'create', 'store', 'show']);
     });
 
     // ─── Nasabah Routes ─────────────────────────────────────────

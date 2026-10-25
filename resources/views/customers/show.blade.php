@@ -3,9 +3,11 @@
 @section('title', 'Detail Nasabah')
 
 @section('content')
+@php($routePrefix = auth()->user()->isAdmin() ? 'admin.nasabah' : 'petugas.nasabah')
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.nasabah.index') }}">Data Nasabah</a></li>
+        <li class="breadcrumb-item"><a href="{{ route($routePrefix . '.index') }}">Data Nasabah</a></li>
         <li class="breadcrumb-item active">{{ $customer->name }}</li>
     </ol>
 </nav>
@@ -19,19 +21,28 @@
             <span class="badge bg-secondary fs-6 align-middle">Nonaktif</span>
         @endif
     </h4>
-    <div class="d-flex gap-2">
-        <a href="{{ route('admin.nasabah.edit', $customer) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-pencil"></i> Ubah
-        </a>
-        @if($customer->is_active)
-            <form method="POST" action="{{ route('admin.nasabah.deactivate', $customer) }}"
-                  onsubmit="return confirm('Nonaktifkan nasabah ini? Data tidak akan dihapus.');">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="btn btn-danger"><i class="bi bi-person-x"></i> Nonaktifkan</button>
-            </form>
-        @endif
-    </div>
+    @if(auth()->user()->isAdmin())
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.nasabah.edit', $customer) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-pencil"></i> Ubah
+            </a>
+            @if($customer->is_active)
+                <form method="POST" action="{{ route('admin.nasabah.deactivate', $customer) }}"
+                      onsubmit="return confirm('Nonaktifkan nasabah ini? Data tidak akan dihapus.');">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-person-x"></i> Nonaktifkan</button>
+                </form>
+            @else
+                <form method="POST" action="{{ route('admin.nasabah.activate', $customer) }}"
+                      onsubmit="return confirm('Aktifkan kembali nasabah ini?');">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="btn btn-success"><i class="bi bi-person-check"></i> Aktifkan</button>
+                </form>
+            @endif
+        </div>
+    @endif
 </div>
 
 <div class="row g-3">
@@ -39,6 +50,9 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <dl class="row mb-0">
+                    <dt class="col-sm-4">Kode Nasabah</dt>
+                    <dd class="col-sm-8"><code>{{ $customer->code }}</code></dd>
+
                     <dt class="col-sm-4">Nama</dt>
                     <dd class="col-sm-8">{{ $customer->name }}</dd>
 
@@ -74,5 +88,5 @@
     </div>
 </div>
 
-<a href="{{ route('admin.nasabah.index') }}" class="btn btn-link mt-3 px-0"><i class="bi bi-arrow-left"></i> Kembali ke daftar</a>
+<a href="{{ route($routePrefix . '.index') }}" class="btn btn-link mt-3 px-0"><i class="bi bi-arrow-left"></i> Kembali ke daftar</a>
 @endsection

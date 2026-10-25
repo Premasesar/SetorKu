@@ -250,4 +250,54 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect(route('login'));
     }
+
+    // ─── PBI-02b: Akun nonaktif ditolak login & auto-logout ─────
+
+    public function test_deactivated_customer_cannot_login(): void
+    {
+        $nasabah = User::where('role', 'nasabah')->first();
+        $customer = $nasabah->customer()->create([
+            'name' => 'Nasabah Test',
+            'address' => 'Jl. Malioboro No. 1',
+        ]);
+        $customer->is_active = false;
+        $customer->save();
+
+        $response = $this->post('/login', [
+            'email' => 'nasabah@test.com',
+            'password' => 'password',
+        ]);
+
+        $this->assertGuest();
+        $response->assertSessionHasErrors([
+            'email' => 'Akun dinonaktifkan. Hubungi admin.',
+        ]);
+    }
+
+    public function test_active_session_of_deactivated_customer_is_logged_out_automatically(): void
+    {
+        $nasabah = User::where('role', 'nasabah')->first();
+        $customer = $nasabah->customer()->create([
+            'name' => 'Nasabah Test',
+            'address' => 'Jl. Malioboro No. 1',
+        ]);
+
+        $this->post('/login', [
+            'email' => 'nasabah@test.com',
+            'password' => 'password',
+        ])->assertRedirect(route('nasabah.dashboard'));
+        $this->assertAuthenticatedAs($nasabah);
+
+        // Admin menonaktifkan nasabah saat sesi masih aktif
+        $customer->is_active = false;
+        $customer->save();
+
+        $response = $this->get('/nasabah/dashboard');
+
+        $this->assertGuest();
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors([
+            'email' => 'Akun dinonaktifkan. Hubungi admin.',
+        ]);
+    }
 }

@@ -10,10 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Pengelolaan Data Nasabah oleh Admin — PBI-02 / FR-002 / UC-02.
+ * Pengelolaan Data Nasabah — PBI-02 & PBI-02b / FR-002 / UC-02.
  *
- * Aksi: daftar (cari nama/alamat + paginasi), tambah, detail, ubah, nonaktifkan.
- * Tidak ada hard delete. Saldo (balance) tidak pernah diambil dari input form.
+ * - Admin: daftar (cari + paginasi), tambah, detail, ubah, nonaktifkan, aktifkan.
+ * - Petugas: daftar (cari + paginasi), tambah, detail. Tidak boleh ubah/nonaktifkan/aktifkan.
+ * - Saldo (balance) tidak pernah diambil dari input form. Tidak ada hard delete.
  */
 class CustomerController extends Controller
 {
@@ -26,6 +27,10 @@ class CustomerController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('address', 'like', "%{$search}%");
+
+                    if (preg_match('/^NSB-0*(\d+)$/i', $search, $matches)) {
+                        $q->orWhere('id', (int) $matches[1]);
+                    }
                 });
             })
             ->latest()
@@ -44,9 +49,7 @@ class CustomerController extends Controller
     {
         $data = $request->validated();
 
-        // Akun User + profil Customer dibuat atomik: gagal salah satu, keduanya dibatalkan.
         $customer = DB::transaction(function () use ($data) {
-            // Password otomatis di-hash oleh cast 'hashed' pada model User
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -62,8 +65,10 @@ class CustomerController extends Controller
             ]);
         });
 
+        $routePrefix = $request->user()->isAdmin() ? 'admin.nasabah' : 'petugas.nasabah';
+
         return redirect()
-            ->route('admin.nasabah.show', $customer)
+            ->route($routePrefix . '.show', $customer)
             ->with('success', 'Nasabah berhasil ditambahkan beserta akun loginnya.');
     }
 
@@ -74,8 +79,10 @@ class CustomerController extends Controller
         return view('customers.show', compact('customer'));
     }
 
-    public function edit(Customer $customer)
+    public function edit(Request $request, Customer $customer)
     {
+        abort_unless($request->user()?->isAdmin(), 403);
+
         $customer->load('user');
 
         return view('customers.edit', compact('customer'));
@@ -105,19 +112,36 @@ class CustomerController extends Controller
     }
 
     /**
-     * Nonaktifkan nasabah: is_active = false, data tidak dihapus.
+     * Nonaktifkan nasabah (idempoten: hanya mengubah menjadi nonaktif, tidak pernah mengaktifkan kembali).
      */
-    public function deactivate(Customer $customer)
+    public function deactivate(Request $request, Customer $customer)
     {
-        $customer->is_active = ! $customer->is_active;
-        $customer->save();
+        abort_unless($request->user()?->isAdmin(), 403);
 
-        $message = $customer->is_active
-            ? 'Nasabah berhasil diaktifkan kembali.'
-            : 'Nasabah berhasil dinonaktifkan.';
+        if ($customer->is_active) {
+            $customer->is_active = false;
+            $customer->save();
+        }
 
         return redirect()
             ->route('admin.nasabah.show', $customer)
-            ->with('success', $message);
+            ->with('success', 'Nasabah berhasil dinonaktifkan.');
+    }
+
+    /**
+     * Aktifkan kembali nasabah (khusus Admin, idempoten).
+     */
+    public function activate(Request $request, Customer $customer)
+    {
+        abort_unless($request->user()?->isAdmin(), 403);
+
+        if (! $customer->is_active) {
+            $customer->is_active = true;
+            $customer->save();
+        }
+
+        return redirect()
+            ->route('admin.nasabah.show', $customer)
+            ->with('success', 'Nasabah berhasil diaktifkan kembali.');
     }
 }
