@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerPickupController;
 use App\Http\Controllers\CustomerPortalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\ImpactController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\OfficerPickupController;
 use App\Http\Controllers\ReportController;
@@ -116,6 +117,10 @@ Route::middleware('auth')->group(function () {
             ->name('rute.index');
         Route::post('rute-penjemputan/simpan', [AdminRouteController::class, 'save'])
             ->name('rute.save');
+
+        // PBI-13: Dashboard Dampak Pengelolaan Sampah (khusus Admin)
+        Route::get('dampak', [ImpactController::class, 'index'])
+            ->name('dampak.index');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────

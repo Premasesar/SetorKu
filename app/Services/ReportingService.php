@@ -167,4 +167,82 @@ class ReportingService
             'pickup_total' => $pickupTotal,
         ];
     }
+
+    /**
+     * Statistik Halaman Admin "Dampak" (seluruh waktu + tren 12 bulan terakhir + distribusi per jenis) — PBI-13.
+     * Hanya bersumber dari data nyata yang tersimpan pada tabel deposits & customers (tanpa estimasi emisi/CO2).
+     *
+     * @return array<string, mixed>
+     */
+    public function impactDashboard(?Carbon $referenceTime = null): array
+    {
+        $now = $referenceTime ? $referenceTime->copy() : now();
+
+        $totalWeightKg = round((float) Deposit::sum('weight'), 3);
+        $totalDepositValue = round((float) Deposit::sum('total_value'), 2);
+        $totalDepositsCount = (int) Deposit::count();
+        $activeCustomersCount = (int) Customer::active()->count();
+
+        // Tren berat (kg) per bulan selama 12 bulan terakhir (kompatibel penuh MySQL & SQLite)
+        $firstMonthStart = $now->copy()->startOfMonth()->subMonths(11);
+        $lastMonthEnd = $now->copy()->endOfMonth();
+
+        $recentDeposits = Deposit::query()
+            ->whereBetween('created_at', [$firstMonthStart, $lastMonthEnd])
+            ->get(['weight', 'created_at']);
+
+        $weightsByMonthKey = [];
+        foreach ($recentDeposits as $deposit) {
+            $key = $deposit->created_at->format('Y-m');
+            $weightsByMonthKey[$key] = ($weightsByMonthKey[$key] ?? 0.0) + (float) $deposit->weight;
+        }
+
+        $monthlySeries = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $monthCursor = $now->copy()->startOfMonth()->subMonths($i);
+            $key = $monthCursor->format('Y-m');
+            $monthlySeries[] = [
+                'key' => $key,
+                'label' => $monthCursor->translatedFormat('M Y'),
+                'weight_kg' => round((float) ($weightsByMonthKey[$key] ?? 0.0), 3),
+            ];
+        }
+
+        // Tabel per jenis sampah (total kg & persentase terhadap seluruh berat terkelola)
+        $aggByType = Deposit::query()
+            ->select(
+                'waste_type_id',
+                DB::raw('COUNT(*) as deposits_count'),
+                DB::raw('COALESCE(SUM(weight), 0) as total_weight'),
+            )
+            ->groupBy('waste_type_id')
+            ->get()
+            ->keyBy('waste_type_id');
+
+        $byWasteType = WasteType::orderBy('name')->get()->map(function (WasteType $wt) use ($aggByType, $totalWeightKg) {
+            $agg = $aggByType->get($wt->id);
+            $weight = round((float) ($agg->total_weight ?? 0.0), 3);
+            $percentage = $totalWeightKg > 0.0
+                ? round(($weight / $totalWeightKg) * 100.0, 2)
+                : 0.0;
+
+            return (object) [
+                'waste_type_id' => $wt->id,
+                'name' => $wt->name,
+                'unit' => $wt->unit,
+                'deposits_count' => (int) ($agg->deposits_count ?? 0),
+                'total_weight_kg' => $weight,
+                'percentage' => $percentage,
+            ];
+        })->sortByDesc('total_weight_kg')->values();
+
+        return [
+            'total_weight_kg' => $totalWeightKg,
+            'total_deposit_value' => $totalDepositValue,
+            'total_deposits_count' => $totalDepositsCount,
+            'active_customers_count' => $activeCustomersCount,
+            'monthly_series' => $monthlySeries,
+            'by_waste_type' => $byWasteType,
+        ];
+    }
 }
