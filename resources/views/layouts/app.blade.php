@@ -89,6 +89,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.rute.*') ? 'active' : '' }}" href="{{ route('admin.rute.index') }}">
+                                <i class="bi bi-signpost-split"></i> Rute Penjemputan
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}" href="{{ route('admin.laporan.index') }}">
                                 <i class="bi bi-journal-text"></i> Laporan Bulanan
                             </a>
@@ -214,6 +219,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('admin.penjemputan.index') }}">
                                 <i class="bi bi-truck"></i> Penjemputan Sampah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.rute.index') }}">
+                                <i class="bi bi-signpost-split"></i> Rute Penjemputan
                             </a>
                         </li>
                         <li class="nav-item">

@@ -49,6 +49,7 @@ class PickupRequest extends Model
             'scheduled_date' => 'date',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'route_sequence' => 'integer',
             'scheduled_at' => 'datetime',
             'completed_at' => 'datetime',
         ];

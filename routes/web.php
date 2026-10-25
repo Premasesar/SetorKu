@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminPickupController;
+use App\Http\Controllers\AdminRouteController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPickupController;
@@ -107,6 +108,12 @@ Route::middleware('auth')->group(function () {
         // PBI-10: Laporan Rekap Bulanan (khusus Admin)
         Route::get('laporan', [ReportController::class, 'index'])
             ->name('laporan.index');
+
+        // PBI-11: Optimasi Rute Penjemputan (Admin menghitung & menyimpan urutan)
+        Route::get('rute-penjemputan', [AdminRouteController::class, 'index'])
+            ->name('rute.index');
+        Route::post('rute-penjemputan/simpan', [AdminRouteController::class, 'save'])
+            ->name('rute.save');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────
@@ -132,13 +139,15 @@ Route::middleware('auth')->group(function () {
             ->parameters(['penarikan' => 'withdrawal'])
             ->only(['index', 'create', 'store', 'show']);
 
-        // PBI-09: Tugas Penjemputan Petugas & Pencatatan Hasil menjadi Setoran
+        // PBI-09 & PBI-11: Tugas Penjemputan Petugas, Peta Rute Read-Only & Pencatatan Hasil menjadi Setoran
         Route::get('penjemputan', [OfficerPickupController::class, 'index'])
             ->name('penjemputan.index');
         Route::get('penjemputan/{pickupRequest}', [OfficerPickupController::class, 'show'])
             ->name('penjemputan.show');
         Route::post('penjemputan/{pickupRequest}/selesaikan', [OfficerPickupController::class, 'complete'])
             ->name('penjemputan.complete');
+        Route::get('rute/{officer?}', [OfficerPickupController::class, 'route'])
+            ->name('rute.show');
     });
 
     // ─── Nasabah Routes ─────────────────────────────────────────

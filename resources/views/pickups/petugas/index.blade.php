@@ -6,9 +6,14 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
     <div>
         <h4 class="fw-bold mb-1"><i class="bi bi-truck"></i> Tugas Penjemputan Terjadwal</h4>
-        <small class="text-muted">Daftar tugas penjemputan berstatus terjadwal yang ditugaskan kepada Anda, diurutkan menurut tanggal jadwal.</small>
+        <small class="text-muted">Daftar tugas terjadwal Anda, diurutkan menurut tanggal jadwal dan urutan rute (<code>route_sequence</code>).</small>
     </div>
+    <a href="{{ route('petugas.rute.show') }}" class="btn btn-outline-success btn-sm">
+        <i class="bi bi-map"></i> Halaman Peta Rute Saya
+    </a>
 </div>
+
+@include('pickups.petugas._route_map', ['todayRoute' => $todayRoute])
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -22,6 +27,7 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
+                            <th>Urutan</th>
                             <th>Kode</th>
                             <th>Tgl Jadwal</th>
                             <th>Nasabah</th>
@@ -33,6 +39,13 @@
                     <tbody>
                         @foreach($pickups as $pickup)
                             <tr>
+                                <td>
+                                    @if($pickup->route_sequence !== null)
+                                        <span class="badge bg-success">#{{ $pickup->route_sequence }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
                                 <td><code>{{ $pickup->code }}</code></td>
                                 <td class="fw-semibold">{{ $pickup->scheduled_date?->format('d-m-Y') }}</td>
                                 <td>

@@ -121,6 +121,10 @@ class PickupService
 
             $officer = $this->resolveActiveOfficer($officerId);
 
+            if ($locked->scheduled_date?->toDateString() !== $scheduledDate || (int) $locked->officer_id !== (int) $officer->id) {
+                $locked->route_sequence = null;
+            }
+
             $locked->scheduled_date = $scheduledDate;
             $locked->officer_id = $officer->id;
             $locked->scheduled_by = $admin->id;

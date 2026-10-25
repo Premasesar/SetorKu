@@ -71,6 +71,8 @@ class ReportingService
             ->where('officer_id', $officer->id)
             ->where('status', PickupRequest::STATUS_TERJADWAL)
             ->whereDate('scheduled_date', $today)
+            ->orderByRaw('CASE WHEN route_sequence IS NULL THEN 1 ELSE 0 END ASC')
+            ->orderBy('route_sequence')
             ->orderBy('id')
             ->get();
 
