@@ -72,3 +72,33 @@ PBI-10 Dashboard per peran + rekap
 
 SEEDER (tambahkan ke DatabaseSeeder, idempoten)
 12 permintaan penjemputan dengan variasi status dan koordinat nyata di sekitar Yogyakarta; minimal 8 berstatus 'terjadwal' pada tanggal yang sama (hari ini) dan ditugaskan ke 2 petugas, untuk uji optimasi rute nanti.
+
+
+PBI-11 Optimasi rute penjemputan (Admin menghitung, Petugas melihat)
+- Class murni PHP `RouteOptimizer` (tanpa akses database, mudah dites): haversine(lat1,lng1,lat2,lng2) dalam km (R = 6371.0088), matriks jarak, nearestNeighbor() dan twoOpt() pada rute TERTUTUP: berangkat dari bank sampah (titik 0, tetap), mengunjungi semua titik, kembali ke bank sampah. twoOpt mengulang sampai tidak ada perbaikan dengan batas iterasi pengaman.
+- Titik bank sampah: config/setorku.php membaca .env (BANK_SAMPAH_NAME, BANK_SAMPAH_LAT, BANK_SAMPAH_LNG), tambahkan juga ke .env.example. Default pusat Kota Yogyakarta. Tambahkan ke .env tanpa menimpa isi lama.
+- Migration baru: pickup_requests.route_sequence (nullable unsigned int). Jangan ubah migration lama.
+- Halaman Admin "Rute Penjemputan": pilih tanggal + petugas (penjemputan berstatus 'terjadwal' pada tanggal itu untuk petugas itu) -> tombol "Hitung rute". Tampilkan: tabel urutan (nomor, kode JMP, nasabah, alamat, jarak dari titik sebelumnya km, jarak kumulatif km); tiga total jarak: urutan awal (berdasarkan waktu permintaan masuk, created_at), hasil Nearest Neighbor, hasil Nearest Neighbor + 2-Opt; persentase penghematan terhadap urutan awal; peta Leaflet dengan marker bernomor, marker bank sampah, dan garis rute. Catatan di halaman: jarak garis lurus (Haversine), bukan jarak jalan, dan 2-Opt tidak menjamin optimum global.
+- Tombol "Simpan urutan rute" menyimpan route_sequence untuk penjemputan tersebut. Admin bisa menghitung ulang kapan saja.
+- Validasi kualitas koordinat sebelum hitung: titik yang kosong, bukan angka, di luar rentang Indonesia (lat -11..6, lng 95..141), atau tepat 0,0 DIKECUALIKAN dari perhitungan dan ditampilkan di daftar "dikecualikan" beserta alasannya. Jika titik valid kurang dari 2, tampilkan pesan bahwa optimasi tidak diperlukan.
+- Petugas: daftar "Tugas Jemput" hari ini diurutkan menurut route_sequence (yang null di akhir), dengan tampilan peta rute miliknya (read-only). Petugas tidak bisa melihat rute petugas lain (403).
+- Tes unit RouteOptimizer dengan kasus yang bisa dihitung manual: jarak (0,0)-(0,1) mendekati 111,19 km; titik segaris dengan hasil yang dapat diprediksi; empat titik di sudut persegi dengan urutan awal menyilang dan twoOpt menghilangkan persilangan; hasil twoOpt tidak pernah lebih panjang dari nearestNeighbor; semua titik terkunjungi tepat sekali. Tes fitur: akses per peran, koordinat tidak valid dikecualikan, route_sequence tersimpan, petugas lain 403.
+- Dokumentasi: docs/OPTIMASI_RUTE.md berisi penjelasan Haversine, Nearest Neighbor, 2-Opt (pseudo-code singkat dan kompleksitas), contoh hasil nyata dari data seeder (jarak awal vs akhir, persen penghematan), dan keterbatasan.
+
+PBI-12 Kartu QR nasabah
+- QR hanya berisi kode nasabah (mis. NSB-0001), tidak ada saldo atau data sensitif. Pembuatan QR di sisi browser memakai library QR via CDN (cdnjs). Tidak instal package PHP.
+- Nasabah: halaman "Kartu Saya" siap cetak (CSS print) berisi nama, kode, QR. Admin dan Petugas: tombol "Cetak kartu" di detail nasabah.
+- Pencarian cepat: di form Catat Setoran dan Catat Penarikan (Petugas), tambahkan kolom isian kode yang otomatis fokus (cocok untuk alat pemindai QR/barcode yang bekerja seperti keyboard) dan tombol "Scan dengan kamera" memakai library pemindai QR via CDN. Hasil scan mengisi kolom pencarian nasabah yang SUDAH ADA (pencarian sudah menerima format NSB-0001) lalu mengirimkannya. Kamera hanya bekerja di HTTPS atau localhost; jika tidak tersedia, tampilkan pesan jelas dan input manual tetap bisa dipakai.
+- Hanya nasabah aktif yang bisa ditemukan untuk transaksi. Nasabah tidak bisa membuka kartu nasabah lain (403).
+- Tes: akses per peran, kode tidak valid ditampilkan sebagai pesan "Nasabah tidak ditemukan", nasabah nonaktif tidak bisa dipilih untuk setoran/penarikan, isi QR hanya kode nasabah.
+
+PBI-13 Dashboard dampak lingkungan (Admin) dan kontribusi nasabah
+- Admin: halaman "Dampak" berisi total sampah terkelola (kg) seluruh waktu, total nilai setoran, jumlah nasabah aktif, grafik batang berat per bulan 12 bulan terakhir (Chart.js via CDN), dan tabel per jenis sampah (total kg, persentase). Data dari tabel deposits.
+- Nasabah: kartu "Kontribusi saya" di dashboard: total kg yang pernah disetor dan jumlah setoran.
+- JANGAN menambahkan estimasi emisi/CO2 atau angka konversi lain yang tidak bersumber dari dokumen proyek. Tampilkan hanya data yang benar-benar tersimpan.
+- Tes: angka sesuai data seeder/hitungan manual, nasabah hanya melihat datanya sendiri, akses per peran.
+
+PENUTUP
+- README.md di root: ringkasan SetorKu, kebutuhan (PHP, Composer, MySQL, Laragon), langkah instalasi (composer install, salin .env, php artisan key:generate, buat database, php artisan migrate --seed), cara menjalankan tes, daftar akun uji (admin, petugas, petugas2, nasabah) dan kata sandinya, serta variabel .env khusus (koordinat bank sampah).
+- docs/PANDUAN_PENGGUNA.md: langkah penggunaan per peran (Admin, Petugas, Nasabah) berbahasa Indonesia, singkat dan berurutan.
+- Pastikan php artisan migrate:fresh --seed di database tes/dev lokal tetap berjalan tanpa error (jalankan hanya pada database SQLite sementara atau :memory:, JANGAN pada database MySQL bank_sampah).
