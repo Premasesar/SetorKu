@@ -41,3 +41,34 @@ PBI-06 Portal nasabah: dashboard saldo + 5 transaksi terakhir; riwayat gabungan 
 
 LAPORAN
 Setelah tiap PBI: file dibuat/diubah, hasil tes, langkah uji manual. Di akhir giliran: hasil `php artisan test` penuh, `git log --oneline -10`, daftar asumsi. Berhenti dan lapor jika tes gagal setelah 2 kali perbaikan atau butuh keputusan.
+
+
+PBI-07 Pengajuan penjemputan (Nasabah)
+- Tabel pickup_requests: customer_id, requested_date (date, tidak boleh lampau), address (text), latitude decimal(10,7), longitude decimal(10,7), notes (nullable, perkiraan jenis/jumlah sampah), status string default 'menunggu', rejection_reason (nullable), scheduled_date (nullable), officer_id (nullable, FK users), scheduled_by (nullable, FK users), scheduled_at (nullable), completed_at (nullable), timestamps.
+- Nilai status: menunggu, ditolak, terjadwal, selesai (gunakan konstanta/enum). Kode tampilan JMP-0001 dari id (accessor, seperti NSB/STR/TRK).
+- Nasabah: form ajukan (alamat dan koordinat terisi dari profil jika ada; pilih titik di peta Leaflet dengan klik; koordinat wajib dan divalidasi rentang Indonesia, lat -11..6, lng 95..141), daftar penjemputan miliknya, detail + status. Akses milik nasabah lain = 403.
+- Tes: validasi, nasabah A tidak bisa melihat milik B, status awal selalu 'menunggu' (input status dari browser diabaikan).
+
+PBI-08 Kelola penjemputan (Admin)
+- Admin: daftar + filter status/tanggal, detail dengan peta. Aksi: Tolak (alasan wajib; hanya dari 'menunggu'), Jadwalkan (tanggal >= hari ini + pilih petugas AKTIF lewat User::scopeActiveOfficers(); hanya dari 'menunggu'), Ubah jadwal (tanggal/petugas, hanya saat 'terjadwal'). Catat scheduled_by dan scheduled_at.
+- Alur status ketat: menunggu -> ditolak | terjadwal -> selesai. Transisi lain ditolak dengan pesan jelas. Admin tidak bisa menyelesaikan penjemputan.
+- Tes: tiap transisi sah dan tidak sah, petugas nonaktif tidak bisa dipilih, petugas/nasabah mendapat 403.
+
+PBI-09 Hasil penjemputan (Petugas) -> setoran
+- Migration baru: deposits.pickup_request_id (nullable, FK, index). Jangan ubah migration lama.
+- Petugas: daftar tugas MILIKNYA yang berstatus 'terjadwal' (urut tanggal), detail dengan peta + tautan ke Google Maps/OSM. Tugas milik petugas lain = 403.
+- Form hasil: 1 sampai 10 baris (jenis sampah aktif + berat > 0), tombol "Tambah baris" dengan JavaScript sederhana, jenis sampah tidak boleh dobel dalam satu penjemputan. Satu baris = satu Deposit (aturan satu setoran = satu jenis tetap berlaku), semua baris terhubung ke pickup_request_id yang sama.
+- WAJIB memakai DepositService yang sudah ada (tambahkan parameter opsional pickup_request_id). Jangan menduplikasi logika saldo/snapshot harga.
+- Satu DB::transaction untuk seluruh proses: kunci baris penjemputan (lockForUpdate), cek status 'terjadwal' dan officer_id = petugas yang login, buat semua Deposit, ubah status 'selesai', isi completed_at. Jika satu baris gagal, SEMUA dibatalkan (tidak ada setoran, saldo tidak berubah, status tetap 'terjadwal'). Tidak bisa diselesaikan dua kali.
+- Riwayat setoran dan bukti setoran menampilkan "Dari penjemputan JMP-xxxx"; detail penjemputan (nasabah/admin) menampilkan daftar bukti setoran yang dihasilkan.
+- Tes: saldo bertambah sesuai total semua baris, rollback total jika satu baris tidak valid (mis. jenis nonaktif), penyelesaian dobel ditolak, petugas lain 403, setiap Deposit punya pickup_request_id, nasabah melihat setoran hasil penjemputan di riwayatnya.
+
+PBI-10 Dashboard per peran + rekap
+- Admin: jumlah nasabah aktif, total saldo seluruh nasabah, setoran bulan ini (jumlah transaksi, total berat, total nilai), penarikan bulan ini, jumlah penjemputan per status, penjemputan terjadwal hari ini.
+- Petugas: tugas penjemputan hari ini, jumlah setoran dan penarikan yang ia catat hari ini.
+- Nasabah: tambahkan status penjemputan aktif terakhir ke dashboard yang sudah ada.
+- Laporan (Admin saja), filter bulan/tahun: (1) rekap setoran per jenis sampah (jumlah transaksi, total berat, total nilai, baris total), (2) rekap penarikan (jumlah, total nominal), (3) rekap penjemputan per status. Tabel sederhana.
+- Tes: angka rekap sesuai data seeder/hitungan manual, akses per peran.
+
+SEEDER (tambahkan ke DatabaseSeeder, idempoten)
+12 permintaan penjemputan dengan variasi status dan koordinat nyata di sekitar Yogyakarta; minimal 8 berstatus 'terjadwal' pada tanggal yang sama (hari ini) dan ditugaskan ke 2 petugas, untuk uji optimasi rute nanti.
