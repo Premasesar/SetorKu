@@ -67,7 +67,12 @@
                     @endif
 
                     @if(auth()->user()->isPetugas())
-                        {{-- Menu Petugas — PBI-02, PBI-04 akan ditambahkan di sini --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('petugas.nasabah.*') ? 'active' : '' }}" href="{{ route('petugas.nasabah.index') }}">
+                                <i class="bi bi-people"></i> Data Nasabah
+                            </a>
+                        </li>
+                        {{-- Menu Petugas — PBI-03, PBI-04 akan ditambahkan di sini --}}
                     @endif
 
                     @if(auth()->user()->isNasabah())
@@ -121,6 +126,13 @@
                         @if(auth()->user()->isAdmin())
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('admin.nasabah.index') }}">
+                                <i class="bi bi-people"></i> Data Nasabah
+                            </a>
+                        </li>
+                        @endif
+                        @if(auth()->user()->isPetugas())
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('petugas.nasabah.index') }}">
                                 <i class="bi bi-people"></i> Data Nasabah
                             </a>
                         </li>

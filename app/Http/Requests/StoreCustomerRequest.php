@@ -8,6 +8,13 @@ namespace App\Http\Requests;
  */
 class StoreCustomerRequest extends CustomerRequest
 {
+    public function authorize(): bool
+    {
+        $user = $this->user();
+
+        return $user !== null && ($user->isAdmin() || $user->isPetugas());
+    }
+
     public function rules(): array
     {
         return array_merge($this->profileRules(), [

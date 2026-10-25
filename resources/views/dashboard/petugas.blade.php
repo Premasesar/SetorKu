@@ -29,7 +29,7 @@
                 <i class="bi bi-search fs-1 text-info"></i>
                 <h6 class="mt-2">Cari Nasabah</h6>
                 <p class="text-muted small">Cari data nasabah terdaftar</p>
-                {{-- Link akan aktif setelah PBI-02 --}}
+                <a href="{{ route('petugas.nasabah.index') }}" class="btn btn-sm btn-info text-white">Buka</a>
             </div>
         </div>
     </div>

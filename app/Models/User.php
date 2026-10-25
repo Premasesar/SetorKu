@@ -53,4 +53,23 @@ class User extends Authenticatable
     {
         return $this->role === 'nasabah';
     }
+
+    /**
+     * Periksa apakah akun aktif.
+     * Menggunakan field customers.is_active untuk akun berperan nasabah.
+     */
+    public function isActiveAccount(): bool
+    {
+        if ($this->isNasabah()) {
+            $customer = $this->relationLoaded('customer')
+                ? $this->customer
+                : $this->customer()->first();
+
+            if ($customer !== null && ! $customer->is_active) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

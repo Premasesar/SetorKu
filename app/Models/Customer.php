@@ -42,4 +42,12 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Kode nasabah terformat (mis. NSB-0001) dari primary key.
+     */
+    public function getCodeAttribute(): string
+    {
+        return sprintf('NSB-%04d', $this->id);
+    }
 }
