@@ -117,6 +117,21 @@ class CustomerPortalController extends Controller
             ->with('success', 'Profil Anda berhasil diperbarui.');
     }
 
+    public function card(Request $request, ?Customer $customer = null)
+    {
+        $ownCustomer = $this->requireOwnCustomer($request);
+
+        if ($customer !== null && (int) $customer->id !== (int) $ownCustomer->id) {
+            abort(403, 'Anda tidak diizinkan membuka kartu nasabah lain.');
+        }
+
+        return view('customers.card', [
+            'customer' => $ownCustomer,
+            'pageTitle' => 'Kartu Saya',
+            'backUrl' => route('nasabah.dashboard'),
+        ]);
+    }
+
     private function requireOwnCustomer(Request $request): Customer
     {
         abort_unless($request->user()?->isNasabah(), 403);

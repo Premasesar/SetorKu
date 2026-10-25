@@ -21,8 +21,11 @@
             <span class="badge bg-secondary fs-6 align-middle">Nonaktif</span>
         @endif
     </h4>
-    @if(auth()->user()->isAdmin())
-        <div class="d-flex gap-2">
+    <div class="d-flex gap-2">
+        <a href="{{ route($routePrefix . '.card', $customer) }}" class="btn btn-outline-success">
+            <i class="bi bi-qr-code"></i> Cetak kartu
+        </a>
+        @if(auth()->user()->isAdmin())
             <a href="{{ route('admin.nasabah.edit', $customer) }}" class="btn btn-outline-secondary">
                 <i class="bi bi-pencil"></i> Ubah
             </a>
@@ -41,8 +44,8 @@
                     <button type="submit" class="btn btn-success"><i class="bi bi-person-check"></i> Aktifkan</button>
                 </form>
             @endif
-        </div>
-    @endif
+        @endif
+    </div>
 </div>
 
 <div class="row g-3">

@@ -12,24 +12,12 @@
 
 <h4 class="fw-bold mb-3"><i class="bi bi-arrow-up-circle"></i> Catat Penarikan Saldo</h4>
 
-{{-- Pencarian Nasabah berdasarkan Nama atau Kode --}}
-<div class="card shadow-sm mb-3">
-    <div class="card-body">
-        <form method="GET" action="{{ route('petugas.penarikan.create') }}" class="row g-2 align-items-end">
-            <div class="col-md-8 col-lg-6">
-                <label for="q" class="form-label mb-1">Cari Nasabah (Nama atau Kode mis. NSB-0001)</label>
-                <input type="text" id="q" name="q" value="{{ $customerSearch }}" class="form-control"
-                       placeholder="Ketik nama atau kode nasabah...">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-outline-success"><i class="bi bi-search"></i> Cari</button>
-                @if($customerSearch !== '')
-                    <a href="{{ route('petugas.penarikan.create') }}" class="btn btn-outline-secondary">Reset</a>
-                @endif
-            </div>
-        </form>
-    </div>
-</div>
+{{-- Pencarian Cepat QR / Kode / Nama Nasabah --}}
+@include('partials._qr_customer_lookup', [
+    'actionRoute' => route('petugas.penarikan.create'),
+    'customerSearch' => $customerSearch,
+    'customers' => $customers,
+])
 
 <div class="card shadow-sm">
     <div class="card-body">

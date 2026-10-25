@@ -62,6 +62,8 @@ Route::middleware('auth')->group(function () {
             ->name('nasabah.deactivate');
         Route::patch('nasabah/{customer}/aktifkan', [CustomerController::class, 'activate'])
             ->name('nasabah.activate');
+        Route::get('nasabah/{customer}/kartu', [CustomerController::class, 'card'])
+            ->name('nasabah.card');
 
         // PBI-03: Pengelolaan Jenis Sampah & Harga (tanpa hard delete)
         Route::resource('jenis-sampah', WasteTypeController::class)
@@ -120,10 +122,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:petugas')->prefix('petugas')->name('petugas.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'petugas'])->name('dashboard');
 
-        // PBI-02b: Petugas hanya boleh melihat/mencari daftar, detail, dan menambah nasabah baru
+        // PBI-02b & PBI-12: Petugas melihat/mencari daftar, detail, cetak kartu QR, dan menambah nasabah baru
         Route::resource('nasabah', CustomerController::class)
             ->parameters(['nasabah' => 'customer'])
             ->only(['index', 'create', 'store', 'show']);
+        Route::get('nasabah/{customer}/kartu', [CustomerController::class, 'card'])
+            ->name('nasabah.card');
 
         // PBI-03: Petugas hanya boleh melihat jenis sampah aktif
         Route::get('jenis-sampah', [WasteTypeController::class, 'index'])
@@ -165,5 +169,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('penjemputan', CustomerPickupController::class)
             ->parameters(['penjemputan' => 'pickupRequest'])
             ->only(['index', 'create', 'store', 'show']);
+
+        // PBI-12: Kartu QR Nasabah ("Kartu Saya")
+        Route::get('kartu/{customer?}', [CustomerPortalController::class, 'card'])
+            ->name('kartu.show');
     });
 });
