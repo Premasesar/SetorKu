@@ -83,6 +83,11 @@
                                 <i class="bi bi-arrow-up-circle"></i> Riwayat Penarikan
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.penjemputan.*') ? 'active' : '' }}" href="{{ route('admin.penjemputan.index') }}">
+                                <i class="bi bi-truck"></i> Penjemputan Sampah
+                            </a>
+                        </li>
                     @endif
 
                     @if(auth()->user()->isPetugas())
@@ -194,6 +199,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('admin.penarikan.index') }}">
                                 <i class="bi bi-arrow-up-circle"></i> Riwayat Penarikan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.penjemputan.index') }}">
+                                <i class="bi bi-truck"></i> Penjemputan Sampah
                             </a>
                         </li>
                         @endif

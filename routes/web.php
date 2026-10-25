@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminPickupController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPickupController;
@@ -88,6 +89,18 @@ Route::middleware('auth')->group(function () {
             ->name('petugas.deactivate');
         Route::patch('petugas/{officer}/aktifkan', [OfficerController::class, 'activate'])
             ->name('petugas.activate');
+
+        // PBI-08: Kelola Penjemputan oleh Admin (tolak, jadwalkan, ubah jadwal)
+        Route::get('penjemputan', [AdminPickupController::class, 'index'])
+            ->name('penjemputan.index');
+        Route::get('penjemputan/{pickupRequest}', [AdminPickupController::class, 'show'])
+            ->name('penjemputan.show');
+        Route::patch('penjemputan/{pickupRequest}/tolak', [AdminPickupController::class, 'reject'])
+            ->name('penjemputan.reject');
+        Route::patch('penjemputan/{pickupRequest}/jadwalkan', [AdminPickupController::class, 'schedule'])
+            ->name('penjemputan.schedule');
+        Route::patch('penjemputan/{pickupRequest}/ubah-jadwal', [AdminPickupController::class, 'reschedule'])
+            ->name('penjemputan.reschedule');
     });
 
     // ─── Petugas Routes ─────────────────────────────────────────
