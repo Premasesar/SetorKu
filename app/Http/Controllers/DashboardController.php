@@ -2,35 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ReportingService;
 use Illuminate\Http\Request;
 
 /**
- * Controller dashboard placeholder untuk setiap role.
- *
- * Mendukung:
- * - FR-001: Redirect sesuai role setelah login
- * - UC-01: Melakukan Login (hasil akhir redirect)
+ * Controller dashboard per peran — PBI-01 & PBI-10.
  */
 class DashboardController extends Controller
 {
+    public function __construct(private readonly ReportingService $reportingService)
+    {
+    }
+
     /**
-     * Dashboard Admin — halaman utama admin setelah login.
+     * Dashboard Admin — ringkasan operasional & penjemputan terjadwal hari ini.
      */
     public function admin()
     {
-        return view('dashboard.admin');
+        $stats = $this->reportingService->adminDashboard();
+
+        return view('dashboard.admin', compact('stats'));
     }
 
     /**
-     * Dashboard Petugas — halaman utama petugas setelah login.
+     * Dashboard Petugas — tugas penjemputan hari ini & transaksi yang dicatat hari ini.
      */
-    public function petugas()
+    public function petugas(Request $request)
     {
-        return view('dashboard.petugas');
+        $stats = $this->reportingService->officerDashboard($request->user());
+
+        return view('dashboard.petugas', compact('stats'));
     }
 
     /**
-     * Dashboard Nasabah — portal utama nasabah setelah login.
+     * Dashboard Nasabah — saldo, 5 transaksi terakhir, & status penjemputan aktif terakhir.
      */
     public function nasabah(Request $request, CustomerPortalController $portalController)
     {
