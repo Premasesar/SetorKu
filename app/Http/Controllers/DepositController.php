@@ -25,7 +25,7 @@ class DepositController extends Controller
     {
         $search = trim((string) $request->query('q', ''));
 
-        $deposits = Deposit::with(['customer', 'wasteType', 'officer'])
+        $deposits = Deposit::with(['customer', 'wasteType', 'officer', 'pickupRequest'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('customer', function ($cq) use ($search) {
@@ -102,7 +102,7 @@ class DepositController extends Controller
     {
         abort_unless($request->user()?->isAdmin() || $request->user()?->isPetugas(), 403);
 
-        $deposit->load(['customer', 'wasteType', 'officer']);
+        $deposit->load(['customer', 'wasteType', 'officer', 'pickupRequest']);
 
         return view('deposits.show', compact('deposit'));
     }

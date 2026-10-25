@@ -62,6 +62,9 @@
                                     @if($tx->type === 'setoran')
                                         {{ $tx->waste_type_name }} — {{ number_format($tx->weight, 3, ',', '.') }} {{ $tx->waste_unit }}
                                         @ Rp {{ number_format($tx->price_per_unit, 2, ',', '.') }}
+                                        @if(!empty($tx->pickup_code))
+                                            <br><span class="badge bg-info text-dark">Dari penjemputan {{ $tx->pickup_code }}</span>
+                                        @endif
                                     @else
                                         Penarikan saldo tabungan
                                     @endif

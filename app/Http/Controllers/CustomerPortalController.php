@@ -61,7 +61,7 @@ class CustomerPortalController extends Controller
 
         abort_unless((int) $deposit->customer_id === (int) $customer->id, 403);
 
-        $deposit->load(['customer', 'wasteType', 'officer']);
+        $deposit->load(['customer', 'wasteType', 'officer', 'pickupRequest']);
 
         return view('portal.show-deposit', compact('deposit'));
     }

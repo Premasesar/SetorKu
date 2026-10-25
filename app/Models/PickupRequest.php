@@ -6,6 +6,7 @@ use App\Enums\PickupStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Model PickupRequest (Permintaan Penjemputan Sampah) — PBI-07 / FR-007.
@@ -66,6 +67,11 @@ class PickupRequest extends Model
     public function scheduler(): BelongsTo
     {
         return $this->belongsTo(User::class, 'scheduled_by');
+    }
+
+    public function deposits(): HasMany
+    {
+        return $this->hasMany(Deposit::class);
     }
 
     public function getCodeAttribute(): string

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Customer;
 use App\Models\PickupRequest;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -15,6 +16,10 @@ use Illuminate\Validation\ValidationException;
  */
 class PickupService
 {
+    public function __construct(private readonly DepositService $depositService)
+    {
+    }
+
     /**
      * Buat pengajuan penjemputan baru oleh nasabah dengan status awal selalu 'menunggu'.
      *
@@ -123,6 +128,66 @@ class PickupService
             $locked->save();
 
             return $locked;
+        });
+    }
+
+    /**
+     * Selesaikan tugas penjemputan oleh Petugas dan hasilkan setoran per baris — PBI-09.
+     *
+     * Berjalan dalam satu DB::transaction atomik: jika satu baris gagal,
+     * seluruh Deposit & penambahan saldo dibatalkan dan status tetap 'terjadwal'.
+     *
+     * @param  list<array{waste_type_id: int|string, weight: float|string}>  $items
+     * @return Collection<int, \App\Models\Deposit>
+     */
+    public function completePickup(PickupRequest $pickupRequest, array $items, User $officer): Collection
+    {
+        abort_unless($officer->isPetugas(), 403);
+
+        $count = count($items);
+        if ($count < 1 || $count > 10) {
+            throw ValidationException::withMessages([
+                'items' => 'Hasil penjemputan harus memuat antara 1 sampai 10 baris jenis sampah.',
+            ]);
+        }
+
+        $wasteTypeIds = array_map(static fn (array $row) => (int) ($row['waste_type_id'] ?? 0), $items);
+        if (count($wasteTypeIds) !== count(array_unique($wasteTypeIds))) {
+            throw ValidationException::withMessages([
+                'items' => 'Jenis sampah tidak boleh duplikat dalam satu penjemputan.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($pickupRequest, $items, $officer) {
+            $locked = PickupRequest::whereKey($pickupRequest->id)->lockForUpdate()->firstOrFail();
+
+            abort_unless((int) $locked->officer_id === (int) $officer->id, 403, 'Tugas penjemputan ini bukan milik Anda.');
+
+            if ($locked->status !== PickupRequest::STATUS_TERJADWAL) {
+                throw ValidationException::withMessages([
+                    'status' => 'Penjemputan ini tidak dalam status terjadwal atau sudah diselesaikan.',
+                ]);
+            }
+
+            $deposits = collect();
+
+            foreach ($items as $item) {
+                $deposit = $this->depositService->recordDeposit(
+                    customerId: (int) $locked->customer_id,
+                    wasteTypeId: (int) $item['waste_type_id'],
+                    weight: $item['weight'],
+                    officer: $officer,
+                    pickupRequestId: $locked->id,
+                );
+
+                $deposits->push($deposit);
+            }
+
+            $locked->status = PickupRequest::STATUS_SELESAI;
+            $locked->completed_at = now();
+            $locked->save();
+
+            return $deposits;
         });
     }
 

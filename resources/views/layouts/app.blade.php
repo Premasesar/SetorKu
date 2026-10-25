@@ -92,6 +92,11 @@
 
                     @if(auth()->user()->isPetugas())
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('petugas.penjemputan.*') ? 'active' : '' }}" href="{{ route('petugas.penjemputan.index') }}">
+                                <i class="bi bi-truck"></i> Tugas Penjemputan
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('petugas.nasabah.*') ? 'active' : '' }}" href="{{ route('petugas.nasabah.index') }}">
                                 <i class="bi bi-people"></i> Data Nasabah
                             </a>
@@ -208,6 +213,11 @@
                         </li>
                         @endif
                         @if(auth()->user()->isPetugas())
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('petugas.penjemputan.index') }}">
+                                <i class="bi bi-truck"></i> Tugas Penjemputan
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('petugas.nasabah.index') }}">
                                 <i class="bi bi-people"></i> Data Nasabah

@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerPortalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\OfficerController;
+use App\Http\Controllers\OfficerPickupController;
 use App\Http\Controllers\WasteTypeController;
 use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +126,14 @@ Route::middleware('auth')->group(function () {
         Route::resource('penarikan', WithdrawalController::class)
             ->parameters(['penarikan' => 'withdrawal'])
             ->only(['index', 'create', 'store', 'show']);
+
+        // PBI-09: Tugas Penjemputan Petugas & Pencatatan Hasil menjadi Setoran
+        Route::get('penjemputan', [OfficerPickupController::class, 'index'])
+            ->name('penjemputan.index');
+        Route::get('penjemputan/{pickupRequest}', [OfficerPickupController::class, 'show'])
+            ->name('penjemputan.show');
+        Route::post('penjemputan/{pickupRequest}/selesaikan', [OfficerPickupController::class, 'complete'])
+            ->name('penjemputan.complete');
     });
 
     // ─── Nasabah Routes ─────────────────────────────────────────

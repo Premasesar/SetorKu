@@ -42,6 +42,7 @@ class CustomerPortalService
             ->selectRaw(
                 "'setoran' as type, " .
                 "deposits.id as record_id, " .
+                "deposits.pickup_request_id as pickup_request_id, " .
                 "deposits.total_value as amount, " .
                 "deposits.weight as weight, " .
                 "waste_types.name as waste_type_name, " .
@@ -57,6 +58,7 @@ class CustomerPortalService
             ->selectRaw(
                 "'penarikan' as type, " .
                 "withdrawals.id as record_id, " .
+                "NULL as pickup_request_id, " .
                 "withdrawals.amount as amount, " .
                 "NULL as weight, " .
                 "NULL as waste_type_name, " .
@@ -82,11 +84,14 @@ class CustomerPortalService
     {
         $id = (int) $row->record_id;
         $isDeposit = $row->type === 'setoran';
+        $pickupId = $row->pickup_request_id !== null ? (int) $row->pickup_request_id : null;
 
         return (object) [
             'type' => $row->type,
             'record_id' => $id,
             'code' => sprintf('%s-%04d', $isDeposit ? 'STR' : 'TRK', $id),
+            'pickup_request_id' => $pickupId,
+            'pickup_code' => $pickupId !== null ? sprintf('JMP-%04d', $pickupId) : null,
             'amount' => (float) $row->amount,
             'weight' => $row->weight !== null ? (float) $row->weight : null,
             'waste_type_name' => $row->waste_type_name,

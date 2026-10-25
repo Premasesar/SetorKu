@@ -55,7 +55,7 @@ class AdminPickupController extends Controller
     {
         abort_unless($request->user()?->isAdmin(), 403);
 
-        $pickupRequest->load(['customer', 'officer', 'scheduler']);
+        $pickupRequest->load(['customer', 'officer', 'scheduler', 'deposits.wasteType']);
         $activeOfficers = User::activeOfficers()->orderBy('name')->get();
 
         return view('pickups.admin.show', compact('pickupRequest', 'activeOfficers'));
