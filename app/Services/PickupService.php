@@ -4,9 +4,14 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\PickupRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Layanan siklus hidup permintaan penjemputan sampah — PBI-07..PBI-09.
+ *
+ * Alur status ketat: menunggu -> ditolak | terjadwal -> selesai.
  */
 class PickupService
 {
@@ -30,5 +35,107 @@ class PickupService
         $pickup->save();
 
         return $pickup;
+    }
+
+    /**
+     * Tolak pengajuan penjemputan (hanya oleh Admin dan hanya dari status 'menunggu').
+     */
+    public function reject(PickupRequest $pickupRequest, string $reason, User $admin): PickupRequest
+    {
+        abort_unless($admin->isAdmin(), 403);
+
+        $cleanReason = trim($reason);
+        if ($cleanReason === '') {
+            throw ValidationException::withMessages([
+                'rejection_reason' => 'Alasan penolakan wajib diisi.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($pickupRequest, $cleanReason) {
+            $locked = PickupRequest::whereKey($pickupRequest->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status !== PickupRequest::STATUS_MENUNGGU) {
+                throw ValidationException::withMessages([
+                    'status' => "Penjemputan berstatus '{$locked->status}' tidak dapat ditolak. Penolakan hanya diizinkan dari status 'menunggu'.",
+                ]);
+            }
+
+            $locked->status = PickupRequest::STATUS_DITOLAK;
+            $locked->rejection_reason = $cleanReason;
+            $locked->save();
+
+            return $locked;
+        });
+    }
+
+    /**
+     * Jadwalkan pengajuan penjemputan (hanya oleh Admin dan hanya dari status 'menunggu').
+     */
+    public function schedule(PickupRequest $pickupRequest, string $scheduledDate, int $officerId, User $admin): PickupRequest
+    {
+        abort_unless($admin->isAdmin(), 403);
+
+        return DB::transaction(function () use ($pickupRequest, $scheduledDate, $officerId, $admin) {
+            $locked = PickupRequest::whereKey($pickupRequest->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status !== PickupRequest::STATUS_MENUNGGU) {
+                throw ValidationException::withMessages([
+                    'status' => "Penjemputan berstatus '{$locked->status}' tidak dapat dijadwalkan ulang lewat aksi ini. Penjadwalan awal hanya diizinkan dari status 'menunggu'.",
+                ]);
+            }
+
+            $officer = $this->resolveActiveOfficer($officerId);
+
+            $locked->status = PickupRequest::STATUS_TERJADWAL;
+            $locked->scheduled_date = $scheduledDate;
+            $locked->officer_id = $officer->id;
+            $locked->scheduled_by = $admin->id;
+            $locked->scheduled_at = now();
+            $locked->rejection_reason = null;
+            $locked->save();
+
+            return $locked;
+        });
+    }
+
+    /**
+     * Ubah jadwal / petugas penjemputan (hanya oleh Admin dan hanya saat status 'terjadwal').
+     */
+    public function reschedule(PickupRequest $pickupRequest, string $scheduledDate, int $officerId, User $admin): PickupRequest
+    {
+        abort_unless($admin->isAdmin(), 403);
+
+        return DB::transaction(function () use ($pickupRequest, $scheduledDate, $officerId, $admin) {
+            $locked = PickupRequest::whereKey($pickupRequest->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status !== PickupRequest::STATUS_TERJADWAL) {
+                throw ValidationException::withMessages([
+                    'status' => "Perubahan jadwal tidak diizinkan untuk penjemputan berstatus '{$locked->status}'. Hanya penjemputan berstatus 'terjadwal' yang dapat diubah jadwalnya.",
+                ]);
+            }
+
+            $officer = $this->resolveActiveOfficer($officerId);
+
+            $locked->scheduled_date = $scheduledDate;
+            $locked->officer_id = $officer->id;
+            $locked->scheduled_by = $admin->id;
+            $locked->scheduled_at = now();
+            $locked->save();
+
+            return $locked;
+        });
+    }
+
+    private function resolveActiveOfficer(int $officerId): User
+    {
+        $officer = User::activeOfficers()->whereKey($officerId)->first();
+
+        if ($officer === null) {
+            throw ValidationException::withMessages([
+                'officer_id' => 'Petugas tidak valid atau sedang nonaktif.',
+            ]);
+        }
+
+        return $officer;
     }
 }
