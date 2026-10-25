@@ -68,6 +68,11 @@
                                 <i class="bi bi-tags"></i> Jenis & Harga Sampah
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.setoran.*') ? 'active' : '' }}" href="{{ route('admin.setoran.index') }}">
+                                <i class="bi bi-arrow-down-circle"></i> Riwayat Setoran
+                            </a>
+                        </li>
                     @endif
 
                     @if(auth()->user()->isPetugas())
@@ -79,6 +84,11 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('petugas.jenis-sampah.*') ? 'active' : '' }}" href="{{ route('petugas.jenis-sampah.index') }}">
                                 <i class="bi bi-tags"></i> Jenis & Harga Sampah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('petugas.setoran.*') ? 'active' : '' }}" href="{{ route('petugas.setoran.index') }}">
+                                <i class="bi bi-arrow-down-circle"></i> Setoran Sampah
                             </a>
                         </li>
                     @endif
@@ -142,6 +152,11 @@
                                 <i class="bi bi-tags"></i> Jenis & Harga Sampah
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('admin.setoran.index') }}">
+                                <i class="bi bi-arrow-down-circle"></i> Riwayat Setoran
+                            </a>
+                        </li>
                         @endif
                         @if(auth()->user()->isPetugas())
                         <li class="nav-item">
@@ -152,6 +167,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ route('petugas.jenis-sampah.index') }}">
                                 <i class="bi bi-tags"></i> Jenis & Harga Sampah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ route('petugas.setoran.index') }}">
+                                <i class="bi bi-arrow-down-circle"></i> Setoran Sampah
                             </a>
                         </li>
                         @endif

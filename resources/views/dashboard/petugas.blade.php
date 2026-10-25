@@ -19,7 +19,7 @@
                 <i class="bi bi-plus-circle fs-1 text-success"></i>
                 <h6 class="mt-2">Buat Setoran Baru</h6>
                 <p class="text-muted small">Catat setoran sampah nasabah</p>
-                {{-- Link akan aktif setelah PBI-04 --}}
+                <a href="{{ route('petugas.setoran.create') }}" class="btn btn-sm btn-success">Catat Setoran</a>
             </div>
         </div>
     </div>
