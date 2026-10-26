@@ -33,16 +33,27 @@
 @unless($isEdit)
     <div class="row g-3 mb-3">
         <div class="col-md-6">
-            <label for="password" class="form-label">Password Awal <span class="text-danger">*</span></label>
-            <input type="password" id="password" name="password" minlength="8"
-                   class="form-control @error('password') is-invalid @enderror" required>
-            @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            <div class="form-text">Minimal 8 karakter.</div>
+            <x-password-input
+                name="password"
+                id="password"
+                label="Password Awal"
+                autocomplete="new-password"
+                help-text="Minimal 8 karakter."
+                minlength="8"
+                :required="true"
+                :required-indicator="true"
+            />
         </div>
         <div class="col-md-6">
-            <label for="password_confirmation" class="form-label">Konfirmasi Password <span class="text-danger">*</span></label>
-            <input type="password" id="password_confirmation" name="password_confirmation" minlength="8"
-                   class="form-control" required>
+            <x-password-input
+                name="password_confirmation"
+                id="password_confirmation"
+                label="Konfirmasi Password"
+                autocomplete="new-password"
+                minlength="8"
+                :required="true"
+                :required-indicator="true"
+            />
         </div>
     </div>
 @endunless
