@@ -78,17 +78,28 @@
                     @method('PATCH')
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password Baru <span class="text-danger">*</span></label>
-                        <input type="password" id="password" name="password" minlength="8"
-                               class="form-control @error('password') is-invalid @enderror" required>
-                        @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        <div class="form-text">Minimal 8 karakter.</div>
+                        <x-password-input
+                            name="password"
+                            id="password"
+                            label="Password Baru"
+                            autocomplete="new-password"
+                            help-text="Minimal 8 karakter."
+                            minlength="8"
+                            :required="true"
+                            :required-indicator="true"
+                        />
                     </div>
 
                     <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Konfirmasi Password Baru <span class="text-danger">*</span></label>
-                        <input type="password" id="password_confirmation" name="password_confirmation" minlength="8"
-                               class="form-control" required>
+                        <x-password-input
+                            name="password_confirmation"
+                            id="password_confirmation"
+                            label="Konfirmasi Password Baru"
+                            autocomplete="new-password"
+                            minlength="8"
+                            :required="true"
+                            :required-indicator="true"
+                        />
                     </div>
 
                     <button type="submit" class="btn btn-warning">
