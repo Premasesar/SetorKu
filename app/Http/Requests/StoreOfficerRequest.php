@@ -11,7 +11,7 @@ class StoreOfficerRequest extends OfficerRequest
     {
         return array_merge($this->officerProfileRules(), [
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
     }
 }

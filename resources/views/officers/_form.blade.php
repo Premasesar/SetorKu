@@ -15,11 +15,12 @@
 </div>
 
 <div class="mb-3">
-    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-    <input type="email" id="email" name="email" maxlength="255"
+    <label for="email" class="form-label">Email akun Google petugas <span class="text-danger">*</span></label>
+    <input type="email" id="email" name="email" maxlength="255" placeholder="nama.petugas@gmail.com"
            class="form-control @error('email') is-invalid @enderror"
            value="{{ old('email', $officer->email ?? '') }}" required>
     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    <div class="form-text">Isi email akun Google petugas agar dapat langsung masuk melalui tombol Masuk dengan Google.</div>
 </div>
 
 <div class="mb-3">
@@ -36,23 +37,23 @@
             <x-password-input
                 name="password"
                 id="password"
-                label="Password Awal"
+                label="Password Awal (opsional)"
                 autocomplete="new-password"
-                help-text="Minimal 8 karakter."
+                help-text="Opsional, minimal 8 karakter jika diisi. Kosongkan bila petugas hanya login dengan Google."
                 minlength="8"
-                :required="true"
-                :required-indicator="true"
+                :required="false"
+                :required-indicator="false"
             />
         </div>
         <div class="col-md-6">
             <x-password-input
                 name="password_confirmation"
                 id="password_confirmation"
-                label="Konfirmasi Password"
+                label="Konfirmasi Password (opsional)"
                 autocomplete="new-password"
                 minlength="8"
-                :required="true"
-                :required-indicator="true"
+                :required="false"
+                :required-indicator="false"
             />
         </div>
     </div>

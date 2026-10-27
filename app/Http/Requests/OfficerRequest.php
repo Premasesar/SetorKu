@@ -14,6 +14,15 @@ abstract class OfficerRequest extends FormRequest
         return (bool) $this->user()?->isAdmin();
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->email)) {
+            $this->merge([
+                'email' => mb_strtolower(trim($this->email)),
+            ]);
+        }
+    }
+
     protected function officerProfileRules(): array
     {
         return [

@@ -16,4 +16,15 @@ return [
         'lat' => (float) env('BANK_SAMPAH_LAT', -7.7970680),
         'lng' => (float) env('BANK_SAMPAH_LNG', 110.3705290),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email Admin Awal pada Seeder (PBI-15)
+    |--------------------------------------------------------------------------
+    |
+    | Memungkinkan pemilik proyek mengisi Gmail aslinya di SEED_ADMIN_EMAIL
+    | agar akun Admin langsung cocok saat login menggunakan Google.
+    |
+    */
+    'seed_admin_email' => env('SEED_ADMIN_EMAIL', 'admin@banksampah.test'),
 ];

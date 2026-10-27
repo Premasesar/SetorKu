@@ -102,3 +102,16 @@ PENUTUP
 - README.md di root: ringkasan SetorKu, kebutuhan (PHP, Composer, MySQL, Laragon), langkah instalasi (composer install, salin .env, php artisan key:generate, buat database, php artisan migrate --seed), cara menjalankan tes, daftar akun uji (admin, petugas, petugas2, nasabah) dan kata sandinya, serta variabel .env khusus (koordinat bank sampah).
 - docs/PANDUAN_PENGGUNA.md: langkah penggunaan per peran (Admin, Petugas, Nasabah) berbahasa Indonesia, singkat dan berurutan.
 - Pastikan php artisan migrate:fresh --seed di database tes/dev lokal tetap berjalan tanpa error (jalankan hanya pada database SQLite sementara atau :memory:, JANGAN pada database MySQL bank_sampah).
+
+
+PBI-14 Ekspor laporan PDF/Excel
+- Dicadangkan (belum dikerjakan).
+
+PBI-15 Login & Pendaftaran Mandiri dengan Akun Google (Gmail Asli)
+- Paket resmi `laravel/socialite` (stateful OAuth bawaan, tanpa `stateless()`, tanpa menyimpan `access_token` atau `refresh_token`).
+- Migration baru: `users.google_id` (`nullable`, `unique`) dan `users.password` menjadi `nullable` (tanpa mengubah migration lama dan tanpa `migrate:fresh`).
+- Login Google untuk ketiga peran (`admin`, `petugas`, `nasabah`) berdasarkan pencocokan email ternormalisasi (`trim` + huruf kecil), wajib `email_verified === true`, menolak `google_id` berbeda bila sudah tertaut, dan menolak akun nonaktif (`Akun dinonaktifkan. Hubungi admin.`).
+- Email Google yang belum terdaftar disimpan sementara di session server (kedaluwarsa 15 menit) dan diarahkan ke `/daftar/lengkapi` untuk membuat akun `User` ber-role `nasabah` + `Customer` bersaldo awal `0` dalam satu `DB::transaction` (`CustomerService`). Field sensitif (`role`, `email`, `google_id`, `is_active`, `balance`) tidak pernah dibaca dari input form.
+- Kelola Petugas (PBI-06b): password awal menjadi opsional dan label email diperjelas menjadi `Email akun Google petugas`.
+- Seeder: email Admin awal membaca `SEED_ADMIN_EMAIL` (default `admin@banksampah.test`).
+- Dokumentasi setup lokal Google Cloud Console tersedia di `docs/SETUP_GOOGLE_LOGIN.md`.
