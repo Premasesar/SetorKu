@@ -41,8 +41,8 @@ Dokumen ini menjelaskan langkah demi langkah penyiapan **Google OAuth 2.0** di *
    - `http://localhost:8000/auth/google/callback`
 7. Klik **Create**, lalu salin nilai **Client ID** dan **Client Secret** yang muncul.
 
-> **Catatan Penting Domain Lokal**:
-> Pastikan domain tempat Anda membuka aplikasi di browser **sama persis** dengan domain pada `APP_URL` dan `GOOGLE_REDIRECT_URI` (contoh: jika `GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback`, bukalah aplikasi di `http://localhost:8000/login`, bukan `http://127.0.0.1:8000/login`, agar cookie session OAuth `state` tidak dianggap berbeda domain oleh browser).
+> **Keputusan Standar Pengujian Lokal**:
+> Pengujian lokal SetorKu ditetapkan menggunakan `php artisan serve --host=localhost --port=8000` (akses melalui `http://localhost:8000`, **bukan** `127.0.0.1` dan **bukan** virtual host `.test` karena Google OAuth menolak akhiran `.test`). Pastikan domain pada browser sama persis dengan `APP_URL` dan `GOOGLE_REDIRECT_URI` agar cookie session OAuth `state` cocok.
 
 ---
 
@@ -85,9 +85,11 @@ Buka `http://localhost:8000/login` di browser dan uji tombol **Masuk dengan Goog
 
 ---
 
-## 6. Ringkasan Aturan Peran pada Login Google
+## 6. Ringkasan Aturan Peran & Keputusan Akun Admin pada Login Google
 
-- **Admin**: Dibuat melalui seeder (`SEED_ADMIN_EMAIL`). Saat pemilik login dengan Gmail tersebut, akun Admin otomatis terhubung.
+- **Admin (Dua Akun Admin — Cadangan + Gmail Pemilik)**:
+  - Akun bawaan `admin@banksampah.test` tetap dipertahankan di database sebagai **akun Admin cadangan** (login email + password).
+  - Saat pemilik proyek mengisi `SEED_ADMIN_EMAIL=gmail.pemilik@gmail.com` di `.env` lalu menjalankan `php artisan db:seed`, seeder (`firstOrCreate`) menambahkan Gmail tersebut sebagai **akun Admin kedua** tanpa menghapus `admin@banksampah.test`. Saat pemilik login memakai tombol **Masuk dengan Google**, akun Admin kedua tersebut otomatis terhubung.
 - **Petugas**: Didaftarkan terlebih dahulu oleh Admin melalui menu **Kelola Petugas** dengan mengisi **Email akun Google petugas** (kolom password bersifat opsional). Saat petugas login dengan Google memakai Gmail tersebut, ia langsung masuk ke **Dashboard Petugas**.
 - **Nasabah**:
   - Jika sudah pernah didaftarkan oleh Admin/Petugas dengan alamat Gmail yang sama, langsung masuk ke **Portal Nasabah**.
