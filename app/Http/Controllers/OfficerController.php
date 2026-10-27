@@ -52,12 +52,13 @@ class OfficerController extends Controller
     public function store(StoreOfficerRequest $request)
     {
         $data = $request->validated();
+        $password = $data['password'] ?? null;
 
         $officer = User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            'email' => mb_strtolower(trim($data['email'])),
             'phone' => $data['phone'] ?? null,
-            'password' => $data['password'],
+            'password' => ($password !== null && $password !== '') ? $password : null,
             'role' => 'petugas',
         ]);
 

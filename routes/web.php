@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminPickupController;
 use App\Http\Controllers\AdminRouteController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPickupController;
@@ -36,6 +37,18 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
+
+    // PBI-15: Login & Pendaftaran Mandiri via Akun Google
+    Route::middleware('throttle:20,1')->group(function () {
+        Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])
+            ->name('google.redirect');
+        Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])
+            ->name('google.callback');
+        Route::get('/daftar/lengkapi', [GoogleAuthController::class, 'showCompleteRegistrationForm'])
+            ->name('google.register.form');
+        Route::post('/daftar/lengkapi', [GoogleAuthController::class, 'completeRegistration'])
+            ->name('google.register.complete');
+    });
 });
 
 // ─── Authenticated Routes ───────────────────────────────────────

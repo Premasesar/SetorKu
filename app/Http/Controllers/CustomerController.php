@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
-use App\Models\User;
+use App\Services\CustomerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -45,26 +45,14 @@ class CustomerController extends Controller
         return view('customers.create');
     }
 
-    public function store(StoreCustomerRequest $request)
+    public function store(StoreCustomerRequest $request, CustomerService $customerService)
     {
         $data = $request->validated();
 
-        $customer = DB::transaction(function () use ($data) {
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => $data['password'],
-                'role' => 'nasabah',
-            ]);
-
-            return $user->customer()->create([
-                'name' => $data['name'],
-                'address' => $data['address'],
-                'phone' => $data['phone'] ?? null,
-                'latitude' => $data['latitude'] ?? null,
-                'longitude' => $data['longitude'] ?? null,
-            ]);
-        });
+        $customer = $customerService->createCustomerAccount(
+            $data,
+            password: $data['password'],
+        );
 
         $routePrefix = $request->user()->isAdmin() ? 'admin.nasabah' : 'petugas.nasabah';
 
