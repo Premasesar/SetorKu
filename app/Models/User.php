@@ -27,6 +27,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
     ];
 
     protected function casts(): array
@@ -85,20 +86,16 @@ class User extends Authenticatable
 
     /**
      * Periksa apakah akun aktif.
-     * - Petugas: memeriksa kolom users.is_active.
-     * - Nasabah: memeriksa kolom users.is_active serta customers.is_active (bila profil tersedia).
+     * - Semua peran: memeriksa kolom users.is_active.
+     * - Nasabah: memeriksa juga customers.is_active (bila profil tersedia).
      */
     public function isActiveAccount(): bool
     {
-        if ($this->isPetugas()) {
-            return (bool) $this->is_active;
+        if (! $this->is_active) {
+            return false;
         }
 
         if ($this->isNasabah()) {
-            if (! $this->is_active) {
-                return false;
-            }
-
             $customer = $this->relationLoaded('customer')
                 ? $this->customer
                 : $this->customer()->first();

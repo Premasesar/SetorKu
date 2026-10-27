@@ -20,8 +20,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $adminEmail = mb_strtolower(trim((string) (config('setorku.seed_admin_email') ?: env('SEED_ADMIN_EMAIL', 'admin@banksampah.test'))));
+        if ($adminEmail === '') {
+            $adminEmail = 'admin@banksampah.test';
+        }
+
         User::firstOrCreate(
-            ['email' => 'admin@banksampah.test'],
+            ['email' => $adminEmail],
             ['name' => 'Admin Bank Sampah', 'password' => 'password', 'role' => 'admin'],
         );
 
