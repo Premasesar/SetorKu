@@ -6,7 +6,7 @@
 
 ## Ringkasan Fitur Utama
 
-1. **Autentikasi & Hak Akses Berbasis Peran**: Pemisahan otorisasi ketat di sisi backend untuk **Admin**, **Petugas**, dan **Nasabah**, termasuk penolakan login & *auto-logout* bagi akun nonaktif.
+1. **Autentikasi & Hak Akses Berbasis Peran (+ Google OAuth)**: Pemisahan otorisasi ketat di sisi backend untuk **Admin**, **Petugas**, dan **Nasabah**, mendukung login email+password maupun **Masuk & Daftar Mandiri Nasabah dengan Akun Google** (`laravel/socialite`), termasuk penolakan login & *auto-logout* bagi akun nonaktif.
 2. **Manajemen Nasabah, Petugas & Master Jenis Sampah**: Pengelolaan data tanpa penghapusan permanen (*non-destructive activation/deactivation*).
 3. **Transaksi Setoran & Penarikan Atomik**: Perhitungan nominal di sisi server dengan *snapshot* harga (`price_per_unit` & `total_value`), penguncian baris (`DB::transaction` + `lockForUpdate`), dan jaminan saldo tidak pernah negatif.
 4. **Penjemputan Sampah Berbasis Peta (Leaflet + OpenStreetMap)**: Pengajuan titik jemput oleh nasabah, penjadwalan/penolakan oleh admin, serta pencatatan hasil penjemputan multi-jenis sampah oleh petugas yang otomatis menghasilkan bukti setoran atomik.
@@ -85,6 +85,10 @@ Konfigurasi titik keberangkatan dan kepulangan rute penjemputan dibaca oleh `con
 | `BANK_SAMPAH_NAME` | Nama lokasi depot Bank Sampah pada peta rute & kartu QR | `"Bank Sampah SetorKu Yogyakarta"` |
 | `BANK_SAMPAH_LAT` | Garis lintang (*latitude*) titik Bank Sampah (rentang `-11..6`) | `-7.7970680` |
 | `BANK_SAMPAH_LNG` | Garis bujur (*longitude*) titik Bank Sampah (rentang `95..141`) | `110.3705290` |
+| `GOOGLE_CLIENT_ID` | Client ID OAuth 2.0 dari Google Cloud Console untuk fitur Masuk/Daftar dengan Google | *(kosong)* |
+| `GOOGLE_CLIENT_SECRET` | Client Secret OAuth 2.0 dari Google Cloud Console | *(kosong)* |
+| `GOOGLE_REDIRECT_URI` | Callback URI Google OAuth lokal | `http://localhost:8000/auth/google/callback` |
+| `SEED_ADMIN_EMAIL` | Email akun Admin awal saat menjalankan `db:seed` (isi dengan Gmail asli pemilik agar cocok saat login Google) | `admin@banksampah.test` |
 
 ---
 
@@ -118,4 +122,5 @@ php artisan test --filter=RouteOptimizerTest
 ## Dokumentasi Tambahan
 
 - [Panduan Pengguna per Peran (`docs/PANDUAN_PENGGUNA.md`)](docs/PANDUAN_PENGGUNA.md)
+- [Panduan Setup Login & Pendaftaran Google (`docs/SETUP_GOOGLE_LOGIN.md`)](docs/SETUP_GOOGLE_LOGIN.md)
 - [Dokumentasi Algoritma Optimasi Rute (`docs/OPTIMASI_RUTE.md`)](docs/OPTIMASI_RUTE.md)
