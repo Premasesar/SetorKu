@@ -176,11 +176,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:nasabah')->prefix('nasabah')->name('nasabah.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'nasabah'])->name('dashboard');
 
-        // PBI-06: Portal Nasabah (riwayat gabungan & profil mandiri)
+        // PBI-06 & PBI-18: Portal Nasabah (riwayat gabungan, lihat profil, & ubah profil mandiri)
         Route::get('/riwayat', [CustomerPortalController::class, 'transactions'])->name('riwayat.index');
         Route::get('/riwayat/setoran/{deposit}', [CustomerPortalController::class, 'showDeposit'])->name('riwayat.deposit');
         Route::get('/riwayat/penarikan/{withdrawal}', [CustomerPortalController::class, 'showWithdrawal'])->name('riwayat.withdrawal');
-        Route::get('/profil', [CustomerPortalController::class, 'editProfile'])->name('profil.edit');
+        Route::get('/profil', [CustomerPortalController::class, 'showProfile'])->name('profil.edit');
+        Route::get('/profil/ubah', [CustomerPortalController::class, 'editProfile'])->name('profil.ubah');
         Route::put('/profil', [CustomerPortalController::class, 'updateProfile'])->name('profil.update');
 
         // PBI-07: Pengajuan Penjemputan Sampah (Nasabah)

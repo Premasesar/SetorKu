@@ -291,7 +291,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{{ route('nasabah.profil.edit') }}">
+                            <a class="nav-link text-white {{ request()->routeIs('nasabah.profil.*') ? 'active' : '' }}" href="{{ route('nasabah.profil.edit') }}">
                                 <i class="bi bi-person-gear"></i> Profil Saya
                             </a>
                         </li>

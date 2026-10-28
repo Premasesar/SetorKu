@@ -89,11 +89,18 @@ class CustomerPortalController extends Controller
         return view('portal.show-withdrawal', compact('withdrawal'));
     }
 
-    public function editProfile(Request $request)
+    public function showProfile(Request $request)
     {
         $customer = $this->requireOwnCustomer($request);
 
         return view('portal.profile', compact('customer'));
+    }
+
+    public function editProfile(Request $request)
+    {
+        $customer = $this->requireOwnCustomer($request);
+
+        return view('portal.profile-edit', compact('customer'));
     }
 
     public function updateProfile(UpdateCustomerProfileRequest $request)
@@ -118,7 +125,7 @@ class CustomerPortalController extends Controller
 
         return redirect()
             ->route('nasabah.profil.edit')
-            ->with('success', 'Profil Anda berhasil diperbarui.');
+            ->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function card(Request $request, ?Customer $customer = null)
