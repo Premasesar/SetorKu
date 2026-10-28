@@ -63,4 +63,4 @@ Panduan singkat penggunaan aplikasi **SetorKu** secara berurutan berdasarkan per
    - Pilih tanggal penjemputan (hari ini atau mendatang), periksa alamat, klik titik jemput pada peta interaktif untuk menyesuaikan koordinat, isi perkiraan sampah pada catatan, lalu klik **Kirim Pengajuan**.
    - Pantau perubahan status (`Menunggu`, `Terjadwal`, `Ditolak`, atau `Selesai` beserta daftar bukti setorannya) pada detail pengajuan.
 5. **Periksa Riwayat Transaksi**: Buka menu **Riwayat Transaksi** untuk menyaring riwayat gabungan setoran dan penarikan serta membuka halaman bukti tiap transaksi.
-6. **Perbarui Profil Mandiri**: Buka menu **Profil Saya** untuk memperbarui nama, nomor HP, alamat, dan titik koordinat rumah default Anda.
+6. **Perbarui Profil Mandiri**: Buka menu **Profil Saya** untuk memperbarui nama, nomor HP, dan alamat. Untuk mengatur atau mengubah **Titik Lokasi Rumah (opsional)**, klik pada peta atau geser pin ke lokasi rumah, atau tekan **Gunakan Lokasi Saya** (browser akan meminta izin lokasi); untuk mengosongkan koordinat yang tersimpan, tekan **Hapus Titik** lalu klik **Simpan Profil**.

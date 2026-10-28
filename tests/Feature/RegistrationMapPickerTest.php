@@ -189,14 +189,14 @@ class RegistrationMapPickerTest extends TestCase
             ->assertSee('Kolom nomor HP wajib diisi.');
     }
 
-    // 7. Komponen peta hanya dipasang di halaman Lengkapi Pendaftaran (belum di Profil Saya / form admin)
+    // 7. Komponen peta tidak dipasang di form Tambah/Ubah Nasabah milik Admin
     public function test_map_picker_component_is_not_installed_on_other_customer_forms(): void
     {
         $admin = User::create(['name' => 'Admin', 'email' => 'admin@test.com', 'password' => 'password', 'role' => 'admin']);
         $nasabah = User::create(['name' => 'Nasabah', 'email' => 'nasabah@test.com', 'password' => 'password', 'role' => 'nasabah']);
-        $nasabah->customer()->create(['name' => 'Nasabah', 'address' => 'Jl. Kaliurang No. 2']);
+        $customer = $nasabah->customer()->create(['name' => 'Nasabah', 'address' => 'Jl. Kaliurang No. 2']);
 
         $this->actingAs($admin)->get(route('admin.nasabah.create'))->assertOk()->assertDontSee('data-map-picker', false);
-        $this->actingAs($nasabah)->get(route('nasabah.profil.edit'))->assertOk()->assertDontSee('data-map-picker', false);
+        $this->actingAs($admin)->get(route('admin.nasabah.edit', $customer))->assertOk()->assertDontSee('data-map-picker', false);
     }
 }

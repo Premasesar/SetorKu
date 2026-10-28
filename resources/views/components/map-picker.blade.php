@@ -7,7 +7,7 @@
     public/js/map-picker.js dimuat sekali per halaman lewat @once sehingga
     komponen bekerja di layout mana pun (termasuk halaman tanpa @stack).
 
-    Saat ini HANYA dipasang di halaman Lengkapi Pendaftaran (/daftar/lengkapi).
+    Dipasang di halaman Lengkapi Pendaftaran (/daftar/lengkapi) dan Profil Saya nasabah (/nasabah/profil).
 --}}
 @props([
     'id' => 'map-picker',
