@@ -39,7 +39,6 @@
         width: 100%;
         border-radius: 0.375rem;
         z-index: 0;
-        touch-action: none;
     }
 </style>
 @endonce

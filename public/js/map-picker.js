@@ -118,7 +118,7 @@
         if (hasInitial) {
             placeMarker(initLat, initLng);
         } else if (clearBtn) {
-            clearBtn.disabled = true;
+            clearBtn.disabled = (latInput.value.trim() === '' && lngInput.value.trim() === '');
         }
 
         map.on('click', function (e) {
