@@ -13,6 +13,8 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class UpdateCustomerProfileRequest extends FormRequest
 {
+    protected $redirectRoute = 'nasabah.profil.ubah';
+
     public function authorize(): bool
     {
         $user = $this->user();

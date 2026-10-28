@@ -1,16 +1,19 @@
 {{--
-    Komponen pemilih titik lokasi (Leaflet 1.9.4 + OpenStreetMap) — PBI-16.
+    Komponen peta titik lokasi (Leaflet 1.9.4 + OpenStreetMap) — PBI-16 / PBI-17 / PBI-18.
 
-    Menampilkan peta yang bisa diklik dengan pin yang bisa digeser, tombol
-    "Gunakan Lokasi Saya" dan "Hapus Titik", serta input latitude/longitude
-    readonly yang diisi peta (7 digit desimal). Aset Leaflet dan
-    public/js/map-picker.js dimuat sekali per halaman lewat @once sehingga
-    komponen bekerja di layout mana pun (termasuk halaman tanpa @stack).
+    Mendukung dua mode:
+    - mode="edit" (default): peta pemilih titik dengan pengaman keadaan TERKUNCI / AKTIF,
+      tombol "Ubah Titik", "Gunakan Lokasi Saya", "Kembalikan Titik Semula", "Hapus Titik",
+      serta input latitude/longitude readonly (7 digit desimal).
+    - mode="view": peta baca-saja (zoom & geser peta aktif, pin tidak bisa digeser, klik
+      peta diabaikan, tanpa input dan tanpa tombol aksi).
 
-    Dipasang di halaman Lengkapi Pendaftaran (/daftar/lengkapi) dan Profil Saya nasabah (/nasabah/profil).
+    Aset Leaflet dan public/js/map-picker.js dimuat sekali per halaman lewat @once.
+    Dipasang di /daftar/lengkapi, /nasabah/profil (mode baca), dan /nasabah/profil/ubah.
 --}}
 @props([
     'id' => 'map-picker',
+    'mode' => 'edit',
     'latName' => 'latitude',
     'lngName' => 'longitude',
     'latValue' => null,
@@ -25,10 +28,12 @@
 ])
 
 @php
+    $isViewMode = ($mode === 'view');
     $latId = $latName;
     $lngId = $lngName;
-    $latError = $errors->has($latName);
-    $lngError = $errors->has($lngName);
+    $latError = !$isViewMode && $errors->has($latName);
+    $lngError = !$isViewMode && $errors->has($lngName);
+    $hasInitialCoords = ($latValue !== null && trim((string) $latValue) !== '' && $lngValue !== null && trim((string) $lngValue) !== '');
 @endphp
 
 @once
@@ -39,13 +44,43 @@
         width: 100%;
         border-radius: 0.375rem;
         z-index: 0;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    .map-picker-canvas.map-picker-canvas--active {
+        border: 2px solid #198754 !important;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.2);
     }
 </style>
 @endonce
 
+@if($isViewMode)
+<div id="{{ $id }}"
+     data-map-picker
+     data-map-picker-mode="view"
+     data-init-lat="{{ $latValue }}"
+     data-init-lng="{{ $lngValue }}"
+     data-selected-zoom="{{ $selectedZoom }}">
+    @if($title)
+        <div class="form-label fw-semibold mb-1">{{ $title }}</div>
+    @endif
+    @if($hint)
+        <div class="form-text mt-0 mb-2">{{ $hint }}</div>
+    @endif
+
+    <div id="{{ $id }}-canvas"
+         class="map-picker-canvas border"
+         style="height: {{ $height }};"
+         data-map-picker-canvas
+         role="region"
+         aria-label="Peta lokasi rumah"></div>
+
+    <div class="small mt-2 text-muted" data-map-picker-status role="status" aria-live="polite"></div>
+</div>
+@else
 <div class="mb-3"
      id="{{ $id }}"
      data-map-picker
+     data-map-picker-mode="edit"
      data-lat-input="{{ $latId }}"
      data-lng-input="{{ $lngId }}"
      data-default-lat="{{ $defaultLat }}"
@@ -57,22 +92,42 @@
     <div class="form-text mt-0 mb-2">{{ $hint }}</div>
 
     <div id="{{ $id }}-canvas"
-         class="map-picker-canvas border"
+         class="map-picker-canvas border {{ $hasInitialCoords ? '' : 'map-picker-canvas--active' }}"
          style="height: {{ $height }};"
          data-map-picker-canvas
          role="application"
          aria-label="Peta pemilihan titik lokasi rumah"></div>
 
+    <div class="small mt-2 text-muted {{ $hasInitialCoords ? '' : 'd-none' }}"
+         data-map-picker-lock-hint>
+        <i class="bi bi-lock-fill" aria-hidden="true"></i> Titik terkunci agar tidak berpindah tanpa sengaja.
+    </div>
+
     <div class="d-flex flex-wrap gap-2 mt-2">
+        <button type="button"
+                class="btn btn-outline-primary btn-sm {{ $hasInitialCoords ? '' : 'd-none' }}"
+                data-map-picker-unlock
+                @if(!$hasInitialCoords) hidden @endif>
+            <i class="bi bi-unlock" aria-hidden="true"></i> Ubah Titik
+        </button>
         <button type="button" class="btn btn-outline-success btn-sm" data-map-picker-locate>
             <i class="bi bi-crosshair" aria-hidden="true"></i> Gunakan Lokasi Saya
+        </button>
+        <button type="button"
+                class="btn btn-outline-warning btn-sm d-none"
+                data-map-picker-reset
+                hidden>
+            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Kembalikan Titik Semula
         </button>
         <button type="button" class="btn btn-outline-secondary btn-sm" data-map-picker-clear>
             <i class="bi bi-x-circle" aria-hidden="true"></i> Hapus Titik
         </button>
     </div>
 
-    <div class="small mt-2 text-muted" data-map-picker-status role="status" aria-live="polite"></div>
+    <div class="small mt-2 {{ $hasInitialCoords ? 'text-muted' : 'text-success fw-semibold' }}"
+         data-map-picker-status
+         role="status"
+         aria-live="polite">{{ $hasInitialCoords ? '' : 'Mode ubah titik aktif: klik peta atau geser pin.' }}</div>
 
     <div class="row g-3 mt-1">
         <div class="col-md-6">
@@ -105,6 +160,7 @@
         </div>
     </div>
 </div>
+@endif
 
 @once
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
