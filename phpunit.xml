@@ -36,5 +36,6 @@
         <env name="GOOGLE_CLIENT_ID" value="fake-google-client-id" force="true"/>
         <env name="GOOGLE_CLIENT_SECRET" value="fake-google-client-secret" force="true"/>
         <env name="GOOGLE_REDIRECT_URI" value="http://localhost:8000/auth/google/callback" force="true"/>
+        <env name="SEED_ADMIN_EMAIL" value="admin@banksampah.test" force="true"/>
     </php>
 </phpunit>

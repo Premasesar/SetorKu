@@ -116,3 +116,11 @@ PBI-15 Login & Pendaftaran Mandiri dengan Akun Google (Gmail Asli)
 - Seeder: email Admin membaca `SEED_ADMIN_EMAIL` (default `admin@banksampah.test`). Keputusan pemilik proyek: akun `admin@banksampah.test` tetap dipertahankan sebagai akun Admin cadangan (email+password), sedangkan Gmail asli pemilik ditambahkan sebagai akun Admin kedua melalui `SEED_ADMIN_EMAIL` saat menjalankan `php artisan db:seed`.
 - Lingkungan uji lokal: pengujian lokal resmi menggunakan `php artisan serve --host=localhost --port=8000` (`http://localhost:8000`, selaras dengan `GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback`, bukan virtual host `.test`).
 - Dokumentasi setup lokal Google Cloud Console tersedia di `docs/SETUP_GOOGLE_LOGIN.md`.
+
+PBI-16 Pilih titik lokasi rumah lewat peta saat pendaftaran nasabah (Leaflet + OSM)
+- Cakupan: HANYA halaman Lengkapi Pendaftaran (`/daftar/lengkapi`). Komponen Blade reusable `resources/views/components/map-picker.blade.php` + JavaScript terpisah `public/js/map-picker.js`; belum dipasang di Profil Saya, form admin, atau halaman lain.
+- Leaflet 1.9.4 via CDN unpkg (sama seperti halaman peta lain di proyek, dengan integrity resmi), tile OpenStreetMap dengan atribusi "OpenStreetMap contributors". Tanpa API key, tanpa geocoding/Nominatim, tanpa library tambahan.
+- Peta lebar penuh tinggi 320px di antara Alamat Lengkap dan Latitude/Longitude; pusat awal Yogyakarta (-7.7970680, 110.3705290) zoom 13; bila ada `old()` koordinat, pusat di titik itu zoom 17 dengan pin. Pin draggable, klik peta memindahkan pin, tombol "Gunakan Lokasi Saya" (geolocation hanya atas klik, pesan ramah tanpa `alert()`), tombol "Hapus Titik". Input latitude/longitude readonly diisi `toFixed(7)`.
+- Server: aturan `CompleteGoogleRegistrationRequest` tetap (nullable, numeric, between -90..90 / -180..180, required_with berpasangan). Nama field, migration, alur OAuth, session, dan aturan peran tidak berubah.
+- `phpunit.xml` memaksa `SEED_ADMIN_EMAIL=admin@banksampah.test` agar tes seeder tidak bergantung pada `.env` lokal pengembang.
+- Catatan pengujian: render HTML komponen, atribut konfigurasi peta, dan validasi server diuji otomatis lewat `RegistrationMapPickerTest`; interaksi browser (klik peta, geser pin, geolokasi, dan layar sentuh HP) diuji manual di browser.
