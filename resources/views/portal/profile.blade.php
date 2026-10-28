@@ -49,13 +49,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="address" class="form-label">Alamat <span class="text-danger">*</span></label>
-                        <textarea id="address" name="address" rows="3" maxlength="1000"
-                                  class="form-control @error('address') is-invalid @enderror" required>{{ old('address', $customer->address) }}</textarea>
-                        @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div class="mb-3">
                         <label for="phone" class="form-label">No. HP <small class="text-muted">(opsional)</small></label>
                         <input type="text" id="phone" name="phone" maxlength="30" placeholder="081234567890"
                                class="form-control @error('phone') is-invalid @enderror"
@@ -63,22 +56,18 @@
                         @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label for="latitude" class="form-label">Latitude <small class="text-muted">(opsional)</small></label>
-                            <input type="text" id="latitude" name="latitude" inputmode="decimal" placeholder="-7.7970680"
-                                   class="form-control @error('latitude') is-invalid @enderror"
-                                   value="{{ old('latitude', $customer->latitude) }}">
-                            @error('latitude') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-md-6">
-                            <label for="longitude" class="form-label">Longitude <small class="text-muted">(opsional)</small></label>
-                            <input type="text" id="longitude" name="longitude" inputmode="decimal" placeholder="110.3705290"
-                                   class="form-control @error('longitude') is-invalid @enderror"
-                                   value="{{ old('longitude', $customer->longitude) }}">
-                            @error('longitude') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Alamat <span class="text-danger">*</span></label>
+                        <textarea id="address" name="address" rows="3" maxlength="1000"
+                                  class="form-control @error('address') is-invalid @enderror" required>{{ old('address', $customer->address) }}</textarea>
+                        @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
+
+                    <x-map-picker
+                        id="profile-location-map"
+                        :lat-value="old('latitude', $customer->latitude)"
+                        :lng-value="old('longitude', $customer->longitude)"
+                    />
 
                     <div class="mt-4 d-flex gap-2">
                         <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan Profil</button>
