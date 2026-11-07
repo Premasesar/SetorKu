@@ -1,69 +1,78 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Dashboard Admin')
 
-@section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <div>
-        <h4 class="fw-bold mb-1">
-            <i class="bi bi-speedometer2"></i> Dashboard Admin
-        </h4>
-        <p class="text-muted mb-0">
-            Selamat datang, {{ auth()->user()->name }}!
-            <span class="badge badge-admin">Admin</span>
-        </p>
-    </div>
-    <a href="{{ route('admin.laporan.index') }}" class="btn btn-outline-success">
-        <i class="bi bi-journal-text"></i> Buka Laporan Bulanan
-    </a>
-</div>
+@section('hero')
+    <x-page-hero
+        title="Dashboard Admin"
+        icon="bi-speedometer2"
+        :breadcrumbs="[['label' => 'Portal Admin'], ['label' => 'Dashboard']]"
+    >
+        Selamat datang, {{ auth()->user()->name }}!
+        <span class="badge badge-admin ms-1">Admin</span>
 
+        <x-slot:actions>
+            <a href="{{ route('admin.laporan.index') }}" class="btn btn-outline-success">
+                <i class="bi bi-journal-text"></i> Buka Laporan Bulanan
+            </a>
+        </x-slot:actions>
+    </x-page-hero>
+@endsection
+
+@section('content')
 <div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="card border-success shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Nasabah Aktif</div>
-                <h3 class="fw-bold text-success mt-1 mb-0">{{ number_format($stats['active_customers_count'], 0, ',', '.') }}</h3>
-            </div>
-        </div>
+        <x-stat-card
+            label="Nasabah Aktif"
+            :value="number_format($stats['active_customers_count'], 0, ',', '.')"
+            icon="bi-people"
+            variant="success"
+            :accent="true"
+        />
     </div>
     <div class="col-md-3">
-        <div class="card border-primary shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Total Saldo Seluruh Nasabah</div>
-                <h4 class="fw-bold text-primary mt-1 mb-0">Rp {{ number_format($stats['total_customer_balance'], 2, ',', '.') }}</h4>
-            </div>
-        </div>
+        <x-stat-card
+            label="Total Saldo Seluruh Nasabah"
+            :value="'Rp ' . number_format($stats['total_customer_balance'], 2, ',', '.')"
+            icon="bi-wallet2"
+            variant="primary"
+            :accent="true"
+            :compact="true"
+        />
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Setoran Bulan Ini ({{ $stats['month_deposits']['count'] }} trx)</div>
-                <h5 class="fw-bold text-success mt-1 mb-1">Rp {{ number_format($stats['month_deposits']['total_value'], 2, ',', '.') }}</h5>
-                <div class="small text-muted">Total Berat: {{ number_format($stats['month_deposits']['total_weight'], 3, ',', '.') }} kg</div>
-            </div>
-        </div>
+        <x-stat-card
+            :label="'Setoran Bulan Ini (' . $stats['month_deposits']['count'] . ' trx)'"
+            :value="'Rp ' . number_format($stats['month_deposits']['total_value'], 2, ',', '.')"
+            :hint="'Total Berat: ' . number_format($stats['month_deposits']['total_weight'], 3, ',', '.') . ' kg'"
+            icon="bi-arrow-down-circle"
+            variant="success"
+            :compact="true"
+        />
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Penarikan Bulan Ini ({{ $stats['month_withdrawals']['count'] }} trx)</div>
-                <h5 class="fw-bold text-danger mt-1 mb-0">Rp {{ number_format($stats['month_withdrawals']['total_amount'], 2, ',', '.') }}</h5>
-            </div>
-        </div>
+        <x-stat-card
+            :label="'Penarikan Bulan Ini (' . $stats['month_withdrawals']['count'] . ' trx)'"
+            :value="'Rp ' . number_format($stats['month_withdrawals']['total_amount'], 2, ',', '.')"
+            icon="bi-arrow-up-circle"
+            variant="danger"
+            :compact="true"
+        />
     </div>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-lg-5">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-semibold"><i class="bi bi-truck"></i> Ringkasan Penjemputan per Status</div>
+            <div class="card-header bg-white fw-semibold"><i class="bi bi-truck text-success me-1"></i> Ringkasan Penjemputan per Status</div>
             <div class="card-body">
                 <div class="row g-2 text-center">
                     @foreach(\App\Enums\PickupStatus::cases() as $case)
                         <div class="col-6">
-                            <div class="border rounded p-2">
-                                <span class="badge {{ $case->badgeClass() }} mb-1">{{ $case->label() }}</span>
+                            <div class="sk-status-tile">
+                                <div class="mb-1">
+                                    <x-status-pill :status="$case" :label="$case->label()" />
+                                </div>
                                 <h4 class="fw-bold mb-0">{{ $stats['pickups_by_status'][$case->value] ?? 0 }}</h4>
                             </div>
                         </div>
@@ -77,13 +86,17 @@
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">
-                    <i class="bi bi-calendar-event"></i> Penjemputan Terjadwal Hari Ini ({{ $stats['today_scheduled_pickups']->count() }})
+                    <i class="bi bi-calendar-event text-success me-1"></i> Penjemputan Terjadwal Hari Ini ({{ $stats['today_scheduled_pickups']->count() }})
                 </span>
                 <a href="{{ route('admin.penjemputan.index', ['status' => 'terjadwal', 'date' => now()->toDateString()]) }}" class="btn btn-sm btn-link">Lihat Semua</a>
             </div>
             <div class="card-body">
                 @if($stats['today_scheduled_pickups']->isEmpty())
-                    <p class="text-muted text-center py-3 mb-0">Tidak ada penjemputan terjadwal untuk hari ini.</p>
+                    <x-empty-state
+                        icon="bi-calendar-check"
+                        message="Tidak ada penjemputan terjadwal untuk hari ini."
+                        :compact="true"
+                    />
                 @else
                     <div class="table-responsive">
                         <table class="table table-sm align-middle mb-0">
