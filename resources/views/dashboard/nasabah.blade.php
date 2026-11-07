@@ -1,66 +1,63 @@
-@extends('layouts.app')
+@extends('layouts.ui-nasabah')
 
 @section('title', 'Portal Nasabah')
 
-@section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <div>
-        <h4 class="fw-bold mb-1">
-            <i class="bi bi-person-circle"></i> Portal Nasabah
-        </h4>
-        <p class="text-muted mb-0">
-            Selamat datang, {{ auth()->user()->name }}!
-            <span class="badge badge-nasabah">Nasabah</span>
-            @if(isset($customer) && $customer)
-                <code class="ms-1">{{ $customer->code }}</code>
-            @endif
-        </p>
-    </div>
-    @if(isset($customer) && $customer)
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('nasabah.kartu.show') }}" class="btn btn-success">
-                <i class="bi bi-qr-code"></i> Kartu Saya
-            </a>
-            <a href="{{ route('nasabah.riwayat.index') }}" class="btn btn-outline-success">
-                <i class="bi bi-clock-history"></i> Riwayat Lengkap
-            </a>
-            <a href="{{ route('nasabah.profil.edit') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-person-gear"></i> Ubah Profil
-            </a>
-        </div>
-    @endif
-</div>
+@section('hero')
+    <x-page-hero
+        title="Portal Nasabah"
+        icon="bi-person-circle"
+        :breadcrumbs="[['label' => 'Portal Nasabah'], ['label' => 'Dashboard']]"
+    >
+        Selamat datang, {{ auth()->user()->name }}!
+        <span class="badge badge-nasabah ms-1">Nasabah</span>
+        @if(isset($customer) && $customer)
+            <code class="ms-1">{{ $customer->code }}</code>
+        @endif
 
+        @if(isset($customer) && $customer)
+            <x-slot:actions>
+                <a href="{{ route('nasabah.kartu.show') }}" class="btn btn-success">
+                    <i class="bi bi-qr-code"></i> Kartu Saya
+                </a>
+                <a href="{{ route('nasabah.riwayat.index') }}" class="btn btn-outline-success">
+                    <i class="bi bi-clock-history"></i> Riwayat Lengkap
+                </a>
+                <a href="{{ route('nasabah.profil.edit') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-person-gear"></i> Ubah Profil
+                </a>
+            </x-slot:actions>
+        @endif
+    </x-page-hero>
+@endsection
+
+@section('content')
 <div class="row g-3 mb-4">
     <div class="col-md-4">
-        <div class="card border-success shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Saldo Tabungan Saat Ini</div>
-                <h3 class="text-success fw-bold mt-1 mb-0">
-                    Rp {{ number_format($customer?->balance ?? 0, 2, ',', '.') }}
-                </h3>
-            </div>
-        </div>
+        <x-stat-card
+            label="Saldo Tabungan Saat Ini"
+            :value="'Rp ' . number_format($customer?->balance ?? 0, 2, ',', '.')"
+            icon="bi-wallet2"
+            variant="success"
+            :accent="true"
+        />
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Total Setoran</div>
-                <h5 class="fw-semibold text-success mt-1 mb-0">
-                    Rp {{ number_format($totalDeposits ?? 0, 2, ',', '.') }}
-                </h5>
-            </div>
-        </div>
+        <x-stat-card
+            label="Total Setoran"
+            :value="'Rp ' . number_format($totalDeposits ?? 0, 2, ',', '.')"
+            icon="bi-arrow-down-circle"
+            variant="success"
+            :compact="true"
+        />
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-muted small">Total Penarikan</div>
-                <h5 class="fw-semibold text-danger mt-1 mb-0">
-                    Rp {{ number_format($totalWithdrawals ?? 0, 2, ',', '.') }}
-                </h5>
-            </div>
-        </div>
+        <x-stat-card
+            label="Total Penarikan"
+            :value="'Rp ' . number_format($totalWithdrawals ?? 0, 2, ',', '.')"
+            icon="bi-arrow-up-circle"
+            variant="danger"
+            :compact="true"
+        />
     </div>
 </div>
 
@@ -84,7 +81,7 @@
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <span class="fw-semibold"><i class="bi bi-truck"></i> Status Penjemputan Aktif Terakhir</span>
+        <span class="fw-semibold"><i class="bi bi-truck text-success me-1"></i> Status Penjemputan Aktif Terakhir</span>
         @if(isset($customer) && $customer)
             <a href="{{ route('nasabah.penjemputan.create') }}" class="btn btn-sm btn-success">
                 <i class="bi bi-plus-circle"></i> Ajukan Penjemputan
@@ -96,7 +93,7 @@
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div>
                     <code>{{ $activePickup->code }}</code>
-                    <span class="badge {{ $activePickup->statusBadgeClass() }} ms-1">{{ $activePickup->statusLabel() }}</span>
+                    <x-status-pill :status="$activePickup->status" :label="$activePickup->statusLabel()" class="ms-1" />
                     <div class="small text-muted mt-1">
                         Diajukan: {{ $activePickup->requested_date?->format('d-m-Y') }}
                         @if($activePickup->scheduled_date)
@@ -119,17 +116,17 @@
 
 <div class="card shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <span class="fw-semibold"><i class="bi bi-clock-history"></i> 5 Transaksi Terakhir</span>
+        <span class="fw-semibold"><i class="bi bi-clock-history text-success me-1"></i> 5 Transaksi Terakhir</span>
         @if(isset($customer) && $customer)
             <a href="{{ route('nasabah.riwayat.index') }}" class="btn btn-sm btn-link">Lihat Semua</a>
         @endif
     </div>
     <div class="card-body">
         @if(empty($recentTransactions) || $recentTransactions->isEmpty())
-            <div class="text-center text-muted py-4">
-                <i class="bi bi-inbox fs-2"></i>
-                <p class="mt-2 mb-0">Belum ada transaksi tercatat.</p>
-            </div>
+            <x-empty-state
+                icon="bi-inbox"
+                message="Belum ada transaksi tercatat."
+            />
         @else
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -150,9 +147,9 @@
                                 <td>{{ $tx->transacted_at?->format('d-m-Y H:i') }}</td>
                                 <td>
                                     @if($tx->type === 'setoran')
-                                        <span class="badge bg-success">Setoran</span>
+                                        <x-status-pill status="setoran" label="Setoran" />
                                     @else
-                                        <span class="badge bg-warning text-dark">Penarikan</span>
+                                        <x-status-pill status="penarikan" label="Penarikan" />
                                     @endif
                                 </td>
                                 <td>

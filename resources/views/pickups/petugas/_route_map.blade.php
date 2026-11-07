@@ -45,7 +45,7 @@
         @else
             <div id="officer-route-map" class="rounded border mb-2" style="height: 340px;"></div>
             <small class="text-muted">
-                Urutan mengikuti hasil optimasi rute Admin (<code>route_sequence</code>). Titik awal & akhir adalah <strong>{{ $todayRoute['depot']['name'] }}</strong> (jarak garis lurus Haversine).
+                Urutan mengikuti hasil optimasi urutan rute Admin. Titik awal & akhir adalah <strong>{{ $todayRoute['depot']['name'] }}</strong> (jarak garis lurus Haversine).
             </small>
         @endif
     </div>

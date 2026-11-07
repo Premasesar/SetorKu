@@ -6,7 +6,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
     <div>
         <h4 class="fw-bold mb-1"><i class="bi bi-truck"></i> Tugas Penjemputan Terjadwal</h4>
-        <small class="text-muted">Daftar tugas terjadwal Anda, diurutkan menurut tanggal jadwal dan urutan rute (<code>route_sequence</code>).</small>
+        <small class="text-muted">Daftar tugas terjadwal Anda, diurutkan menurut tanggal jadwal dan urutan rute.</small>
     </div>
     <a href="{{ route('petugas.rute.show') }}" class="btn btn-outline-success btn-sm">
         <i class="bi bi-map"></i> Halaman Peta Rute Saya
