@@ -1,16 +1,23 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Tambah Jenis Sampah')
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.jenis-sampah.index') }}">Jenis & Harga Sampah</a></li>
-        <li class="breadcrumb-item active">Tambah</li>
-    </ol>
-</nav>
-
-<h4 class="fw-bold mb-3"><i class="bi bi-plus-lg"></i> Tambah Jenis Sampah</h4>
+<x-page-hero
+    title="Tambah Jenis Sampah"
+    subtitle="Tambahkan kategori jenis sampah baru beserta harga beli per satuan."
+    icon="bi-plus-lg"
+    :breadcrumbs="[
+        ['label' => 'Jenis & Harga Sampah', 'url' => route('admin.jenis-sampah.index')],
+        ['label' => 'Tambah'],
+    ]"
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.jenis-sampah.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -18,7 +25,7 @@
             @csrf
             @include('waste-types._form')
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="mt-4 d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan</button>
                 <a href="{{ route('admin.jenis-sampah.index') }}" class="btn btn-outline-secondary">Batal</a>
             </div>
