@@ -1,27 +1,22 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Detail Nasabah')
 
 @section('content')
 @php($routePrefix = auth()->user()->isAdmin() ? 'admin.nasabah' : 'petugas.nasabah')
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route($routePrefix . '.index') }}">Data Nasabah</a></li>
-        <li class="breadcrumb-item active">{{ $customer->name }}</li>
-    </ol>
-</nav>
+<x-page-hero
+    :title="$customer->name"
+    icon="bi-person-vcard"
+    :breadcrumbs="[
+        ['label' => 'Data Nasabah', 'url' => route($routePrefix . '.index')],
+        ['label' => $customer->name],
+    ]"
+>
+    <code>{{ $customer->code }}</code>
+    <x-status-pill :status="$customer->is_active ? 'aktif' : 'nonaktif'" class="ms-1" />
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h4 class="fw-bold mb-0">
-        <i class="bi bi-person-vcard"></i> {{ $customer->name }}
-        @if($customer->is_active)
-            <span class="badge bg-success fs-6 align-middle">Aktif</span>
-        @else
-            <span class="badge bg-secondary fs-6 align-middle">Nonaktif</span>
-        @endif
-    </h4>
-    <div class="d-flex gap-2">
+    <x-slot:actions>
         <a href="{{ route($routePrefix . '.card', $customer) }}" class="btn btn-outline-success">
             <i class="bi bi-qr-code"></i> Cetak kartu
         </a>
@@ -45,19 +40,22 @@
                 </form>
             @endif
         @endif
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="row g-3">
     <div class="col-lg-8">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-person-lines-fill"></i> Identitas & Biodata Nasabah
+            </div>
             <div class="card-body">
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Kode Nasabah</dt>
                     <dd class="col-sm-8"><code>{{ $customer->code }}</code></dd>
 
                     <dt class="col-sm-4">Nama</dt>
-                    <dd class="col-sm-8">{{ $customer->name }}</dd>
+                    <dd class="col-sm-8 fw-semibold">{{ $customer->name }}</dd>
 
                     <dt class="col-sm-4">Email (akun login)</dt>
                     <dd class="col-sm-8">{{ $customer->user?->email ?? '-' }}</dd>
@@ -84,8 +82,8 @@
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="card shadow-sm border-success">
-            <div class="card-body text-center">
+        <div class="card shadow-sm border-success h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-4">
                 <i class="bi bi-wallet2 fs-1 text-success"></i>
                 <h6 class="mt-2 text-muted">Saldo</h6>
                 <h3 class="fw-bold text-success mb-0">Rp {{ number_format($customer->balance, 0, ',', '.') }}</h3>
