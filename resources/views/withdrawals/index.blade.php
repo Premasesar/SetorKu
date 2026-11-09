@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Riwayat Penarikan')
 
@@ -6,38 +6,40 @@
 @php($isPetugas = auth()->user()->isPetugas())
 @php($routePrefix = $isPetugas ? 'petugas.penarikan' : 'admin.penarikan')
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-up-circle"></i> Riwayat Penarikan Saldo</h4>
+<x-page-hero
+    title="Riwayat Penarikan Saldo"
+    subtitle="Rekapitulasi transaksi pencairan saldo tabungan sampah nasabah yang telah tercatat."
+    eyebrow="TRANSAKSI PENARIKAN SALDO"
+    icon="bi-arrow-up-circle"
+>
     @if($isPetugas)
         <a href="{{ route('petugas.penarikan.create') }}" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Catat Penarikan Baru
         </a>
     @endif
-</div>
+</x-page-hero>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <form method="GET" action="{{ route($routePrefix . '.index') }}" class="row g-2 mb-3">
-            <div class="col-md-8 col-lg-6">
-                <input type="text" name="q" value="{{ $search }}" class="form-control"
-                       placeholder="Cari nama/kode nasabah atau kode penarikan...">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-outline-success"><i class="bi bi-search"></i> Cari</button>
-                @if($search !== '')
-                    <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary">Reset</a>
-                @endif
-            </div>
-        </form>
+<div class="card sk-card shadow-sm">
+    <div class="card-body p-3 p-md-4">
+        <x-table-toolbar
+            :action="route($routePrefix . '.index')"
+            :search="$search"
+            searchName="q"
+            placeholder="Cari nama/kode nasabah atau kode penarikan..."
+            :resetUrl="route($routePrefix . '.index')"
+            :showReset="$search !== ''"
+        />
 
         @if($withdrawals->isEmpty())
-            <div class="text-center text-muted py-5">
-                <i class="bi bi-inbox fs-1"></i>
+            <div class="sk-empty-state text-center text-muted py-5">
+                <div class="sk-empty-icon mx-auto mb-2">
+                    <i class="bi bi-inbox fs-3"></i>
+                </div>
                 <p class="mt-2 mb-0">Belum ada riwayat penarikan saldo.</p>
             </div>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table sk-table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Kode</th>
@@ -54,7 +56,7 @@
                                 <td><code>{{ $withdrawal->code }}</code></td>
                                 <td>{{ $withdrawal->created_at?->format('d-m-Y H:i') }}</td>
                                 <td>
-                                    {{ $withdrawal->customer?->name }}
+                                    <span class="fw-semibold">{{ $withdrawal->customer?->name }}</span>
                                     <br><small class="text-muted">{{ $withdrawal->customer?->code }}</small>
                                 </td>
                                 <td class="text-end fw-semibold text-danger">Rp {{ number_format($withdrawal->amount, 2, ',', '.') }}</td>
@@ -70,7 +72,36 @@
                 </table>
             </div>
 
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            {{-- Mobile Card View (<768px) --}}
+            <div class="d-md-none d-flex flex-column gap-3">
+                @foreach($withdrawals as $withdrawal)
+                    <div class="card border shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <div>
+                                    <code>{{ $withdrawal->code }}</code>
+                                    <div class="fw-bold mt-1">{{ $withdrawal->customer?->name }}</div>
+                                    <small class="text-muted">{{ $withdrawal->customer?->code }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block">{{ $withdrawal->created_at?->format('d-m-Y H:i') }}</small>
+                                    <span class="fw-bold text-danger">Rp {{ number_format($withdrawal->amount, 2, ',', '.') }}</span>
+                                </div>
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <div><strong>Petugas:</strong> {{ $withdrawal->officer?->name }}</div>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <a href="{{ route($routePrefix . '.show', $withdrawal) }}" class="btn btn-sm btn-outline-primary">
+                                    Bukti
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-2 border-top">
                 <small class="text-muted">
                     Menampilkan {{ $withdrawals->firstItem() }}–{{ $withdrawals->lastItem() }} dari {{ $withdrawals->total() }} penarikan
                 </small>
