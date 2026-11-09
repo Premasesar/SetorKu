@@ -1,17 +1,24 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Ubah Nasabah')
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.nasabah.index') }}">Data Nasabah</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('admin.nasabah.show', $customer) }}">{{ $customer->name }}</a></li>
-        <li class="breadcrumb-item active">Ubah</li>
-    </ol>
-</nav>
-
-<h4 class="fw-bold mb-3"><i class="bi bi-pencil-square"></i> Ubah Data Nasabah</h4>
+<x-page-hero
+    title="Ubah Data Nasabah"
+    :subtitle="'Perbarui informasi profil dan akun nasabah ' . $customer->name . ' (' . $customer->code . ').'"
+    icon="bi-pencil-square"
+    :breadcrumbs="[
+        ['label' => 'Data Nasabah', 'url' => route('admin.nasabah.index')],
+        ['label' => $customer->name, 'url' => route('admin.nasabah.show', $customer)],
+        ['label' => 'Ubah'],
+    ]"
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.nasabah.show', $customer) }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -20,7 +27,7 @@
             @method('PUT')
             @include('customers._form')
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="mt-4 d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan Perubahan</button>
                 <a href="{{ route('admin.nasabah.show', $customer) }}" class="btn btn-outline-secondary">Batal</a>
             </div>
