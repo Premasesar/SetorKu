@@ -573,3 +573,54 @@ body.sk-theme {
 .sk-status-tile { border: 1px solid var(--sk-surface); border-radius: var(--sk-radius-md); padding: 0.75rem; background: var(--sk-surface-low); text-align: center; height: 100%; }
 .sk-section-title { font-size: 0.9375rem; font-weight: 700; color: var(--sk-text); display: flex; align-items: center; gap: 0.5rem; margin: 0; }
 .sk-section-title i { color: var(--sk-brand); }
+
+/* ===== 14. Batch 1 (PBI-UI-01): form, peta, kamera QR, kartu mobile = */
+/* Bagian form bertingkat (Lengkapi Pendaftaran, form hasil penjemputan) */
+.sk-form-section { border: 1px solid var(--sk-surface); border-radius: var(--sk-radius-lg); padding: 1.25rem; margin-bottom: 1rem; background: #fff; }
+.sk-form-section__title { font-size: 0.875rem; font-weight: 700; color: var(--sk-text); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+.sk-form-section__title i { color: var(--sk-brand); }
+
+/* Peta (Leaflet) — bingkai seragam, tinggi dikurangi di Phone */
+.sk-map { border-radius: var(--sk-radius-md); border: 1px solid var(--sk-surface-highest); overflow: hidden; z-index: 0; }
+.sk-map--route { height: 340px; }
+.sk-map--route-lg { height: 480px; }
+.sk-map--detail { height: 280px; }
+@media (max-width: 767.98px) {
+    .sk-map--route { height: 260px; }
+    .sk-map--route-lg { height: 320px; }
+    .sk-map--detail { height: 220px; }
+}
+.sk-theme .map-picker-canvas.map-picker-canvas--active { border-color: var(--sk-brand) !important; box-shadow: 0 0 0 0.2rem rgba(28, 134, 52, 0.2); }
+.sk-map-note { font-size: var(--sk-fs-body-sm); color: var(--sk-text-muted); margin-top: 0.5rem; display: block; }
+
+/* Kotak keterangan (info/metadata) */
+.sk-info-list { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin: 0; }
+@media (min-width: 576px) { .sk-info-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sk-info-list__item { background: var(--sk-surface-low); border-radius: var(--sk-radius-md); padding: 0.75rem 0.875rem; }
+.sk-info-list__item--full { grid-column: 1 / -1; }
+.sk-info-list dt { font-size: var(--sk-fs-label-sm); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--sk-text-muted); margin-bottom: 0.25rem; }
+.sk-info-list dd { margin: 0; font-weight: 600; color: var(--sk-text); word-break: break-word; }
+
+/* Kamera QR (html5-qrcode) */
+.sk-qr-panel { border: 1px dashed var(--sk-outline-variant); border-radius: var(--sk-radius-lg); background: var(--sk-surface-low); padding: 1rem; }
+.sk-qr-panel #qr-camera-reader { border-radius: var(--sk-radius-md); overflow: hidden; background: #fff; }
+
+/* Daftar kartu mobile pengganti tabel lebar (d-md-none) */
+.sk-mobile-list { display: grid; gap: 0.75rem; }
+.sk-mobile-card { background: #fff; border: 1px solid var(--sk-surface); border-radius: var(--sk-radius-lg); padding: 1rem; box-shadow: var(--sk-shadow-1); }
+.sk-mobile-card__head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.625rem; }
+.sk-mobile-card__row { display: flex; justify-content: space-between; gap: 1rem; font-size: var(--sk-fs-body-md); padding: 0.25rem 0; border-top: 1px dashed var(--sk-surface); }
+.sk-mobile-card__row:first-of-type { border-top: 0; }
+.sk-mobile-card__label { color: var(--sk-text-muted); font-size: var(--sk-fs-label-sm); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; flex-shrink: 0; padding-top: 0.15rem; }
+.sk-mobile-card__value { text-align: right; font-weight: 500; word-break: break-word; }
+.sk-mobile-card__actions { margin-top: 0.75rem; display: grid; gap: 0.5rem; }
+
+/* Lencana urutan rute */
+.sk-seq-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 2rem; height: 2rem; padding: 0 0.5rem; border-radius: var(--sk-radius-pill); background: var(--sk-brand); color: #fff; font-weight: 700; font-size: 0.8125rem; }
+
+/* Tombol aksi utama lebar penuh di Phone */
+@media (max-width: 767.98px) {
+    .sk-btn-block-mobile { width: 100%; display: flex; justify-content: center; }
+    .sk-hero__actions { width: 100%; }
+    .sk-hero__actions .btn { flex: 1 1 auto; justify-content: center; }
+}
