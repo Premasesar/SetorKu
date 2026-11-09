@@ -1,30 +1,33 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Tugas Penjemputan Saya')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <div>
-        <h4 class="fw-bold mb-1"><i class="bi bi-truck"></i> Tugas Penjemputan Terjadwal</h4>
-        <small class="text-muted">Daftar tugas terjadwal Anda, diurutkan menurut tanggal jadwal dan urutan rute.</small>
-    </div>
-    <a href="{{ route('petugas.rute.show') }}" class="btn btn-outline-success btn-sm">
-        <i class="bi bi-map"></i> Halaman Peta Rute Saya
-    </a>
-</div>
+<x-page-hero
+    title="Tugas Penjemputan Terjadwal"
+    subtitle="Daftar tugas terjadwal Anda, diurutkan menurut tanggal jadwal dan urutan rute."
+    icon="bi-truck"
+    :breadcrumbs="['Portal Petugas', 'Tugas Penjemputan']"
+>
+    <x-slot:actions>
+        <a href="{{ route('petugas.rute.show') }}" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-map"></i> Halaman Peta Rute Saya
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 @include('pickups.petugas._route_map', ['todayRoute' => $todayRoute])
 
 <div class="card shadow-sm">
     <div class="card-body">
         @if($pickups->isEmpty())
-            <div class="text-center text-muted py-5">
-                <i class="bi bi-check2-circle fs-1 text-success"></i>
-                <p class="mt-2 mb-0">Tidak ada tugas penjemputan terjadwal untuk Anda saat ini.</p>
-            </div>
+            <x-empty-state
+                icon="bi-check2-circle"
+                message="Tidak ada tugas penjemputan terjadwal untuk Anda saat ini."
+            />
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover align-middle sk-table">
                     <thead class="table-light">
                         <tr>
                             <th>Urutan</th>
@@ -63,6 +66,44 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="sk-mobile-list d-md-none mb-3">
+                @foreach($pickups as $pickup)
+                    <div class="sk-mobile-card">
+                        <div class="sk-mobile-card__head">
+                            <div>
+                                @if($pickup->route_sequence !== null)
+                                    <span class="badge bg-success me-1">#{{ $pickup->route_sequence }}</span>
+                                @else
+                                    <span class="text-muted me-1">-</span>
+                                @endif
+                                <code>{{ $pickup->code }}</code>
+                            </div>
+                            <span class="fw-semibold small">{{ $pickup->scheduled_date?->format('d-m-Y') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Nasabah</span>
+                            <span class="sk-mobile-card__value">
+                                {{ $pickup->customer?->name }}
+                                <small class="text-muted d-block">{{ $pickup->customer?->code }}</small>
+                            </span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Alamat</span>
+                            <span class="sk-mobile-card__value">{{ \Illuminate\Support\Str::limit($pickup->address, 50) }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Catatan</span>
+                            <span class="sk-mobile-card__value">{{ \Illuminate\Support\Str::limit($pickup->notes ?? '-', 35) }}</span>
+                        </div>
+                        <div class="sk-mobile-card__actions">
+                            <a href="{{ route('petugas.penjemputan.show', $pickup) }}" class="btn btn-sm btn-success w-100">
+                                Detail & Catat Hasil
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">

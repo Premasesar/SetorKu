@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Tugas Penjemputan ' . $pickupRequest->code)
 
@@ -11,19 +11,23 @@
 @endpush
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('petugas.penjemputan.index') }}">Tugas Penjemputan</a></li>
-        <li class="breadcrumb-item active">{{ $pickupRequest->code }}</li>
-    </ol>
-</nav>
+<x-page-hero
+    :title="'Tugas Penjemputan ' . $pickupRequest->code"
+    icon="bi-truck"
+    :breadcrumbs="[
+        ['label' => 'Tugas Penjemputan', 'url' => route('petugas.penjemputan.index')],
+        ['label' => $pickupRequest->code],
+    ]"
+>
+    <code>{{ $pickupRequest->code }}</code>
+    <span class="badge {{ $pickupRequest->statusBadgeClass() }} align-middle ms-1">{{ $pickupRequest->statusLabel() }}</span>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h4 class="fw-bold mb-0">
-        <i class="bi bi-truck"></i> Tugas Penjemputan <code>{{ $pickupRequest->code }}</code>
-        <span class="badge {{ $pickupRequest->statusBadgeClass() }} fs-6 align-middle">{{ $pickupRequest->statusLabel() }}</span>
-    </h4>
-</div>
+    <x-slot:actions>
+        <a href="{{ route('petugas.penjemputan.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Kembali ke daftar tugas
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 @if($errors->any())
     <div class="alert alert-danger">
@@ -36,10 +40,12 @@
     </div>
 @endif
 
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-4">
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-semibold">Informasi Nasabah & Lokasi</div>
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-person-lines-fill"></i> Informasi Nasabah & Lokasi
+            </div>
             <div class="card-body">
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Kode</dt>
@@ -72,8 +78,8 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <span class="fw-semibold">Peta & Navigasi</span>
-                <div class="d-flex gap-2">
+                <span class="fw-semibold"><i class="bi bi-pin-map"></i> Peta & Navigasi</span>
+                <div class="d-flex flex-wrap gap-2">
                     <a href="https://www.google.com/maps?q={{ $pickupRequest->latitude }},{{ $pickupRequest->longitude }}"
                        target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-geo-alt"></i> Google Maps
@@ -85,7 +91,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <div id="officer-pickup-map" class="border"></div>
+                <div id="officer-pickup-map" class="sk-map border"></div>
             </div>
         </div>
     </div>
@@ -94,7 +100,7 @@
 @if($pickupRequest->status === \App\Models\PickupRequest::STATUS_TERJADWAL)
     @php($oldItems = old('items', [['waste_type_id' => '', 'weight' => '']]))
     <div class="card shadow-sm border-success">
-        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <div class="card-header bg-success text-white d-flex flex-wrap justify-content-between align-items-center gap-2">
             <span class="fw-semibold"><i class="bi bi-clipboard2-check"></i> Catat Hasil Timbangan Penjemputan (1–10 Jenis Sampah)</span>
             <button type="button" id="btn-add-row" class="btn btn-sm btn-light text-success fw-semibold">
                 <i class="bi bi-plus-circle"></i> Tambah Baris
@@ -139,7 +145,7 @@
                     @endforeach
                 </div>
 
-                <div class="mt-4 d-flex gap-2">
+                <div class="mt-4 d-flex flex-wrap gap-2">
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-check2-circle"></i> Simpan Setoran & Selesaikan Penjemputan
                     </button>
@@ -154,8 +160,8 @@
             <i class="bi bi-receipt"></i> Bukti Setoran Hasil Penjemputan ({{ $pickupRequest->deposits->count() }} setoran)
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-sm align-middle mb-0">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-sm align-middle mb-0 sk-table">
                     <thead class="table-light">
                         <tr>
                             <th>Kode Setoran</th>
@@ -181,6 +187,32 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="sk-mobile-list d-md-none">
+                @foreach($pickupRequest->deposits as $deposit)
+                    <div class="sk-mobile-card">
+                        <div class="sk-mobile-card__head">
+                            <code>{{ $deposit->code }}</code>
+                            <span class="fw-semibold text-success">Rp {{ number_format($deposit->total_value, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Jenis Sampah</span>
+                            <span class="sk-mobile-card__value">{{ $deposit->wasteType?->name }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Berat</span>
+                            <span class="sk-mobile-card__value">{{ number_format($deposit->weight, 3, ',', '.') }} {{ $deposit->wasteType?->unit }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Harga Snapshot</span>
+                            <span class="sk-mobile-card__value">Rp {{ number_format($deposit->price_per_unit, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__actions">
+                            <a href="{{ route('petugas.setoran.show', $deposit) }}" class="btn btn-sm btn-outline-primary w-100">Bukti</a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>

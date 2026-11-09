@@ -28,7 +28,7 @@
     @endpush
 @endonce
 
-<div class="card shadow-sm mb-3">
+<div class="card shadow-sm mb-4">
     <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
         <span class="fw-semibold">
             <i class="bi bi-map"></i> Peta Rute Penjemputan Saya ({{ $todayRoute['date'] }}) — Read-Only
@@ -43,7 +43,7 @@
         @if(empty($todayRoute['markers']))
             <p class="text-muted mb-0">Belum ada titik tugas penjemputan berkoordinat valid pada tanggal {{ $todayRoute['date'] }}.</p>
         @else
-            <div id="officer-route-map" class="rounded border mb-2" style="height: 340px;"></div>
+            <div id="officer-route-map" class="sk-map sk-map--md rounded border mb-2" style="height: 340px;"></div>
             <small class="text-muted">
                 Urutan mengikuti hasil optimasi urutan rute Admin. Titik awal & akhir adalah <strong>{{ $todayRoute['depot']['name'] }}</strong> (jarak garis lurus Haversine).
             </small>
