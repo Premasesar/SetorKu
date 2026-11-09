@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(auth()->user()?->isNasabah() ? 'layouts.ui-nasabah' : 'layouts.ui-staff')
 
 @section('title', $pageTitle ?? 'Kartu QR Nasabah')
 
@@ -7,8 +7,9 @@
     .qr-member-card {
         max-width: 420px;
         border: 2px solid #198754;
-        border-radius: 12px;
+        border-radius: 16px;
         background: #ffffff;
+        overflow: hidden;
     }
     #customer-qr-code img,
     #customer-qr-code canvas {
@@ -23,12 +24,21 @@
         .sidebar,
         .navbar,
         .offcanvas,
+        .sk-sidebar,
+        .sk-topbar,
+        .sk-bottom-bar,
+        .sk-nasabah-header,
+        .sk-footer,
+        .sk-hero,
         .no-print,
         .alert {
             display: none !important;
         }
         .content-wrapper,
-        .content-wrapper > .p-4 {
+        .content-wrapper > .p-4,
+        .sk-staff__main,
+        .sk-staff__content,
+        .sk-nasabah__main {
             padding: 0 !important;
             margin: 0 !important;
         }
@@ -42,20 +52,28 @@
 @endpush
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 no-print">
-    <div>
-        <h4 class="fw-bold mb-1"><i class="bi bi-qr-code"></i> {{ $pageTitle ?? 'Kartu QR Nasabah' }}</h4>
-        <small class="text-muted">Kartu identitas nasabah siap cetak. Kode QR hanya memuat kode nasabah tanpa saldo maupun data sensitif.</small>
-    </div>
-    <div class="d-flex gap-2">
+@php
+    $portalCrumb = auth()->user()?->isNasabah()
+        ? 'Portal Nasabah'
+        : (auth()->user()?->isAdmin() ? 'Portal Admin' : 'Portal Petugas');
+@endphp
+
+<x-page-hero
+    :title="$pageTitle ?? 'Kartu QR Nasabah'"
+    subtitle="Kartu identitas nasabah siap cetak. Kode QR hanya memuat kode nasabah tanpa saldo maupun data sensitif."
+    icon="bi-qr-code"
+    :breadcrumbs="[$portalCrumb, $pageTitle ?? 'Kartu QR Nasabah']"
+    class="no-print"
+>
+    <x-slot:actions>
         <button type="button" onclick="window.print()" class="btn btn-success">
             <i class="bi bi-printer"></i> Cetak Kartu
         </button>
         <a href="{{ $backUrl }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="qr-member-card card shadow-sm mx-auto my-4">
     <div class="card-header bg-success text-white text-center py-3">
