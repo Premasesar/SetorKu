@@ -1,18 +1,25 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Tambah Nasabah')
 
 @section('content')
 @php($routePrefix = auth()->user()->isAdmin() ? 'admin.nasabah' : 'petugas.nasabah')
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route($routePrefix . '.index') }}">Data Nasabah</a></li>
-        <li class="breadcrumb-item active">Tambah</li>
-    </ol>
-</nav>
-
-<h4 class="fw-bold mb-3"><i class="bi bi-person-plus"></i> Tambah Nasabah</h4>
+<x-page-hero
+    title="Tambah Nasabah"
+    subtitle="Daftarkan nasabah baru beserta akun login Portal Nasabah."
+    icon="bi-person-plus"
+    :breadcrumbs="[
+        ['label' => 'Data Nasabah', 'url' => route($routePrefix . '.index')],
+        ['label' => 'Tambah'],
+    ]"
+>
+    <x-slot:actions>
+        <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -20,7 +27,7 @@
             @csrf
             @include('customers._form')
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="mt-4 d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan</button>
                 <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary">Batal</a>
             </div>
