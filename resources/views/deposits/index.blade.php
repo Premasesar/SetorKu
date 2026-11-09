@@ -1,43 +1,48 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Riwayat Setoran')
 
 @section('content')
 @php($isPetugas = auth()->user()->isPetugas())
 @php($routePrefix = $isPetugas ? 'petugas.setoran' : 'admin.setoran')
+@php($portalLabel = $isPetugas ? 'Portal Petugas' : 'Portal Admin')
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-down-circle"></i> Riwayat Setoran</h4>
+<x-page-hero
+    title="Riwayat Setoran"
+    subtitle="Catatan seluruh transaksi setoran sampah nasabah beserta harga snapshot dan nilai tabungan."
+    icon="bi-arrow-down-circle"
+    :breadcrumbs="[$portalLabel, 'Riwayat Setoran']"
+>
     @if($isPetugas)
-        <a href="{{ route('petugas.setoran.create') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Catat Setoran Baru
-        </a>
+        <x-slot:actions>
+            <a href="{{ route('petugas.setoran.create') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Catat Setoran Baru
+            </a>
+        </x-slot:actions>
     @endif
-</div>
+</x-page-hero>
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <form method="GET" action="{{ route($routePrefix . '.index') }}" class="row g-2 mb-3">
-            <div class="col-md-8 col-lg-6">
-                <input type="text" name="q" value="{{ $search }}" class="form-control"
-                       placeholder="Cari nama/kode nasabah, kode setoran, atau jenis sampah...">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-outline-success"><i class="bi bi-search"></i> Cari</button>
-                @if($search !== '')
-                    <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary">Reset</a>
-                @endif
-            </div>
-        </form>
+        <x-table-toolbar
+            :action="route($routePrefix . '.index')"
+            search-name="q"
+            :search-value="$search"
+            placeholder="Cari nama/kode nasabah, kode setoran, atau jenis sampah..."
+            submit-label="Cari"
+            :reset-url="$search !== '' ? route($routePrefix . '.index') : null"
+            reset-label="Reset"
+            class="mb-3"
+        />
 
         @if($deposits->isEmpty())
-            <div class="text-center text-muted py-5">
-                <i class="bi bi-inbox fs-1"></i>
-                <p class="mt-2 mb-0">Belum ada riwayat setoran.</p>
-            </div>
+            <x-empty-state
+                icon="bi-inbox"
+                message="Belum ada riwayat setoran."
+            />
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover align-middle sk-table">
                     <thead class="table-light">
                         <tr>
                             <th>Kode</th>
@@ -79,6 +84,54 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="sk-mobile-list d-md-none mb-3">
+                @foreach($deposits as $deposit)
+                    <div class="sk-mobile-card">
+                        <div class="sk-mobile-card__head">
+                            <div>
+                                <code>{{ $deposit->code }}</code>
+                                @if($deposit->pickupRequest)
+                                    <span class="badge bg-info text-dark ms-1">Dari penjemputan {{ $deposit->pickupRequest->code }}</span>
+                                @endif
+                            </div>
+                            <span class="fw-semibold text-success">Rp {{ number_format($deposit->total_value, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Waktu</span>
+                            <span class="sk-mobile-card__value">{{ $deposit->created_at?->format('d-m-Y H:i') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Nasabah</span>
+                            <span class="sk-mobile-card__value">
+                                {{ $deposit->customer?->name }}
+                                <small class="text-muted d-block">{{ $deposit->customer?->code }}</small>
+                            </span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Jenis Sampah</span>
+                            <span class="sk-mobile-card__value">{{ $deposit->wasteType?->name }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Berat</span>
+                            <span class="sk-mobile-card__value">{{ number_format($deposit->weight, 3, ',', '.') }} {{ $deposit->wasteType?->unit }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Harga Snapshot</span>
+                            <span class="sk-mobile-card__value">Rp {{ number_format($deposit->price_per_unit, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Petugas</span>
+                            <span class="sk-mobile-card__value">{{ $deposit->officer?->name }}</span>
+                        </div>
+                        <div class="sk-mobile-card__actions">
+                            <a href="{{ route($routePrefix . '.show', $deposit) }}" class="btn btn-sm btn-outline-primary w-100">
+                                Bukti
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
