@@ -1,14 +1,28 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Detail Jenis Sampah')
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.jenis-sampah.index') }}">Jenis & Harga Sampah</a></li>
-        <li class="breadcrumb-item active">{{ $wasteType->name }}</li>
-    </ol>
-</nav>
+<x-page-hero
+    :title="$wasteType->name"
+    subtitle="Detail master jenis sampah dan status ketersediaan transaksi."
+    icon="bi-tags"
+    :breadcrumbs="[
+        ['label' => 'Jenis & Harga Sampah', 'url' => route('admin.jenis-sampah.index')],
+        ['label' => $wasteType->name],
+    ]"
+>
+    <x-status-pill :status="$wasteType->is_active ? 'aktif' : 'nonaktif'" />
+
+    <x-slot:actions>
+        <a href="{{ route('admin.jenis-sampah.edit', $wasteType) }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-pencil"></i> Ubah
+        </a>
+        <a href="{{ route('admin.jenis-sampah.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -18,15 +32,11 @@
             <dd class="col-sm-8">{{ $wasteType->unit }}</dd>
 
             <dt class="col-sm-4">Harga per Satuan</dt>
-            <dd class="col-sm-8">Rp {{ number_format($wasteType->price_per_unit, 2, ',', '.') }}</dd>
+            <dd class="col-sm-8 fw-semibold text-success">Rp {{ number_format($wasteType->price_per_unit, 2, ',', '.') }}</dd>
 
             <dt class="col-sm-4">Status</dt>
             <dd class="col-sm-8 mb-0">
-                @if($wasteType->is_active)
-                    <span class="badge bg-success">Aktif</span>
-                @else
-                    <span class="badge bg-secondary">Nonaktif</span>
-                @endif
+                <x-status-pill :status="$wasteType->is_active ? 'aktif' : 'nonaktif'" />
             </dd>
         </dl>
     </div>
