@@ -1,5 +1,8 @@
 {{-- Partial Pencarian Cepat Kode / QR Nasabah (Scanner Keyboard & Kamera via CDN) — PBI-12 --}}
-<div class="card shadow-sm mb-3">
+<div class="card shadow-sm mb-4 sk-qr-panel">
+    <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-qr-code-scan"></i> Pemindai Kartu QR & Pencarian Cepat Nasabah
+    </div>
     <div class="card-body">
         <div class="row g-2 align-items-end mb-3">
             <div class="col-md-7 col-lg-6">
@@ -13,7 +16,7 @@
                        autofocus
                        autocomplete="off">
             </div>
-            <div class="col-auto d-flex gap-2">
+            <div class="col-auto d-flex flex-wrap gap-2">
                 <button type="button" id="btn-scan-camera" class="btn btn-outline-primary">
                     <i class="bi bi-camera"></i> Scan dengan kamera
                 </button>
@@ -32,7 +35,7 @@
                 <input type="text" id="q" name="q" value="{{ $customerSearch }}" class="form-control"
                        placeholder="Ketik nama atau kode nasabah...">
             </div>
-            <div class="col-auto">
+            <div class="col-auto d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-outline-success"><i class="bi bi-search"></i> Cari</button>
                 @if($customerSearch !== '')
                     <a href="{{ $actionRoute }}" class="btn btn-outline-secondary">Reset</a>

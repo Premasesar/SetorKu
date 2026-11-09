@@ -1,16 +1,23 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Catat Setoran Sampah')
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('petugas.setoran.index') }}">Riwayat Setoran</a></li>
-        <li class="breadcrumb-item active">Catat Setoran</li>
-    </ol>
-</nav>
-
-<h4 class="fw-bold mb-3"><i class="bi bi-plus-circle"></i> Catat Setoran Sampah</h4>
+<x-page-hero
+    title="Catat Setoran Sampah"
+    subtitle="Pencatatan setoran sampah nasabah dengan kalkulasi otomatis harga snapshot dan saldo."
+    icon="bi-plus-circle"
+    :breadcrumbs="[
+        ['label' => 'Riwayat Setoran', 'url' => route('petugas.setoran.index')],
+        ['label' => 'Catat Setoran'],
+    ]"
+>
+    <x-slot:actions>
+        <a href="{{ route('petugas.setoran.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Riwayat Setoran
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Pencarian Cepat QR / Kode / Nama Nasabah --}}
 @include('partials._qr_customer_lookup', [
@@ -20,6 +27,9 @@
 ])
 
 <div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-clipboard-plus"></i> Formulir Transaksi Setoran
+    </div>
     <div class="card-body">
         @if($errors->any())
             <div class="alert alert-danger">
@@ -81,7 +91,7 @@
                 </div>
             </div>
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="mt-4 d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan Setoran</button>
                 <a href="{{ route('petugas.setoran.index') }}" class="btn btn-outline-secondary">Batal</a>
             </div>

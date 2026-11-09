@@ -1,16 +1,26 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Catat Penarikan Saldo')
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+<nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb mb-0">
         <li class="breadcrumb-item"><a href="{{ route('petugas.penarikan.index') }}">Riwayat Penarikan</a></li>
         <li class="breadcrumb-item active">Catat Penarikan</li>
     </ol>
 </nav>
 
-<h4 class="fw-bold mb-3"><i class="bi bi-arrow-up-circle"></i> Catat Penarikan Saldo</h4>
+<x-page-hero
+    title="Catat Penarikan Saldo"
+    subtitle="Pencatatan pencairan saldo tabungan sampah nasabah dengan pemeriksaan kecukupan saldo."
+    icon="bi-arrow-up-circle"
+>
+    <x-slot:actions>
+        <a href="{{ route('petugas.penarikan.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Riwayat Penarikan
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Pencarian Cepat QR / Kode / Nama Nasabah --}}
 @include('partials._qr_customer_lookup', [
@@ -19,8 +29,11 @@
     'customers' => $customers,
 ])
 
-<div class="card shadow-sm">
-    <div class="card-body">
+<div class="card sk-card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-cash-stack text-success me-1"></i> Formulir Transaksi Penarikan</h5>
+    </div>
+    <div class="card-body p-3 p-md-4">
         @if($errors->any())
             <div class="alert alert-danger">
                 <i class="bi bi-exclamation-triangle-fill"></i> Penarikan gagal disimpan. Periksa kembali isian berikut.
@@ -31,7 +44,7 @@
             @csrf
 
             <div class="mb-3">
-                <label for="customer_id" class="form-label">Nasabah Aktif <span class="text-danger">*</span></label>
+                <label for="customer_id" class="form-label fw-semibold">Nasabah Aktif <span class="text-danger">*</span></label>
                 <select id="customer_id" name="customer_id" class="form-select @error('customer_id') is-invalid @enderror" required>
                     <option value="" data-balance="0">-- Pilih Nasabah --</option>
                     @foreach($customers as $customer)
@@ -50,7 +63,7 @@
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label for="amount" class="form-label">Nominal Penarikan (Rp) <span class="text-danger">*</span></label>
+                    <label for="amount" class="form-label fw-semibold">Nominal Penarikan (Rp) <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text">Rp</span>
                         <input type="number" step="0.01" min="0.01" id="amount" name="amount"
@@ -60,7 +73,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Perkiraan Sisa Saldo</label>
+                    <label class="form-label fw-semibold">Perkiraan Sisa Saldo</label>
                     <div class="form-control bg-light fw-bold" id="remaining-balance">Rp 0,00</div>
                     <div class="form-text">Validasi kecukupan saldo diputuskan sepenuhnya oleh server saat disimpan.</div>
                 </div>
