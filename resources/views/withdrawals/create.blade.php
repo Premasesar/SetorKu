@@ -13,12 +13,13 @@
 <x-page-hero
     title="Catat Penarikan Saldo"
     subtitle="Pencatatan pencairan saldo tabungan sampah nasabah dengan pemeriksaan kecukupan saldo."
-    eyebrow="TRANSAKSI PENARIKAN SALDO"
     icon="bi-arrow-up-circle"
 >
-    <a href="{{ route('petugas.penarikan.index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Riwayat Penarikan
-    </a>
+    <x-slot:actions>
+        <a href="{{ route('petugas.penarikan.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Riwayat Penarikan
+        </a>
+    </x-slot:actions>
 </x-page-hero>
 
 {{-- Pencarian Cepat QR / Kode / Nama Nasabah --}}

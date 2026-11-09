@@ -9,13 +9,14 @@
 <x-page-hero
     title="Riwayat Penarikan Saldo"
     subtitle="Rekapitulasi transaksi pencairan saldo tabungan sampah nasabah yang telah tercatat."
-    eyebrow="TRANSAKSI PENARIKAN SALDO"
     icon="bi-arrow-up-circle"
 >
     @if($isPetugas)
-        <a href="{{ route('petugas.penarikan.create') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Catat Penarikan Baru
-        </a>
+        <x-slot:actions>
+            <a href="{{ route('petugas.penarikan.create') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Catat Penarikan Baru
+            </a>
+        </x-slot:actions>
     @endif
 </x-page-hero>
 
@@ -23,11 +24,13 @@
     <div class="card-body p-3 p-md-4">
         <x-table-toolbar
             :action="route($routePrefix . '.index')"
-            :search="$search"
-            searchName="q"
+            search-name="q"
+            :search-value="$search"
             placeholder="Cari nama/kode nasabah atau kode penarikan..."
-            :resetUrl="route($routePrefix . '.index')"
-            :showReset="$search !== ''"
+            submit-label="Cari"
+            :reset-url="$search !== '' ? route($routePrefix . '.index') : null"
+            reset-label="Reset"
+            class="mb-3"
         />
 
         @if($withdrawals->isEmpty())

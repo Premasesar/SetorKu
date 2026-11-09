@@ -17,15 +17,16 @@
     <x-page-hero
         title="Bukti Penarikan Saldo"
         :subtitle="'Rincian transaksi penarikan saldo ' . $withdrawal->code . ' — ' . ($withdrawal->customer?->name ?? '-')"
-        eyebrow="BUKTI TRANSAKSI PENARIKAN"
         icon="bi-receipt"
     >
-        <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Riwayat Penarikan
-        </a>
-        <button type="button" onclick="window.print()" class="btn btn-outline-primary">
-            <i class="bi bi-printer"></i> Cetak Bukti
-        </button>
+        <x-slot:actions>
+            <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Riwayat Penarikan
+            </a>
+            <button type="button" onclick="window.print()" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-printer"></i> Cetak Bukti
+            </button>
+        </x-slot:actions>
     </x-page-hero>
 </div>
 

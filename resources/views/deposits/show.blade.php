@@ -17,15 +17,16 @@
     <x-page-hero
         title="Bukti Setoran Sampah"
         :subtitle="'Rincian transaksi setoran ' . $deposit->code . ' — ' . ($deposit->customer?->name ?? '-')"
-        eyebrow="BUKTI TRANSAKSI SETORAN"
         icon="bi-receipt"
     >
-        <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Riwayat Setoran
-        </a>
-        <button type="button" onclick="window.print()" class="btn btn-outline-primary">
-            <i class="bi bi-printer"></i> Cetak Bukti
-        </button>
+        <x-slot:actions>
+            <a href="{{ route($routePrefix . '.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Riwayat Setoran
+            </a>
+            <button type="button" onclick="window.print()" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-printer"></i> Cetak Bukti
+            </button>
+        </x-slot:actions>
     </x-page-hero>
 </div>
 
