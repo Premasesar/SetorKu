@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Detail Penjemputan ' . $pickupRequest->code)
 
@@ -11,19 +11,30 @@
 @endpush
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+<nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb mb-0">
         <li class="breadcrumb-item"><a href="{{ route('admin.penjemputan.index') }}">Kelola Penjemputan</a></li>
         <li class="breadcrumb-item active">{{ $pickupRequest->code }}</li>
     </ol>
 </nav>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h4 class="fw-bold mb-0">
-        <i class="bi bi-truck"></i> Penjemputan <code>{{ $pickupRequest->code }}</code>
+<x-page-hero
+    :title="'Penjemputan ' . $pickupRequest->code"
+    :subtitle="'Detail pengajuan penjemputan nasabah ' . ($pickupRequest->customer?->name ?? '-') . ' beserta pengelolaan jadwal dan petugas.'"
+    icon="bi-truck"
+    :breadcrumbs="[
+        ['label' => 'Portal Admin'],
+        ['label' => 'Kelola Penjemputan', 'url' => route('admin.penjemputan.index')],
+        ['label' => $pickupRequest->code],
+    ]"
+>
+    <x-slot:actions>
         <span class="badge {{ $pickupRequest->statusBadgeClass() }} fs-6 align-middle">{{ $pickupRequest->statusLabel() }}</span>
-    </h4>
-</div>
+        <a href="{{ route('admin.penjemputan.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Daftar Penjemputan
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 @if($errors->any())
     <div class="alert alert-danger">
@@ -43,31 +54,33 @@
 
 <div class="row g-3 mb-3">
     <div class="col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-semibold">Informasi Pengajuan & Jadwal</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Kode</dt>
+        <div class="card sk-card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-3">
+                <i class="bi bi-info-circle text-success me-1"></i> Informasi Pengajuan & Jadwal
+            </div>
+            <div class="card-body p-3 p-md-4">
+                <dl class="row mb-0 g-2">
+                    <dt class="col-sm-5 text-muted">Kode</dt>
                     <dd class="col-sm-7"><code>{{ $pickupRequest->code }}</code></dd>
 
-                    <dt class="col-sm-5">Nasabah</dt>
+                    <dt class="col-sm-5 text-muted">Nasabah</dt>
                     <dd class="col-sm-7">
-                        {{ $pickupRequest->customer?->name }} (<code>{{ $pickupRequest->customer?->code }}</code>)
+                        <span class="fw-semibold">{{ $pickupRequest->customer?->name }}</span> (<code>{{ $pickupRequest->customer?->code }}</code>)
                         @if($pickupRequest->customer?->phone)
                             <br><small class="text-muted">{{ $pickupRequest->customer->phone }}</small>
                         @endif
                     </dd>
 
-                    <dt class="col-sm-5">Tgl Pengajuan</dt>
+                    <dt class="col-sm-5 text-muted">Tgl Pengajuan</dt>
                     <dd class="col-sm-7">{{ $pickupRequest->requested_date?->format('d-m-Y') }}</dd>
 
-                    <dt class="col-sm-5">Tgl Dijadwalkan</dt>
+                    <dt class="col-sm-5 text-muted">Tgl Dijadwalkan</dt>
                     <dd class="col-sm-7">{{ $pickupRequest->scheduled_date?->format('d-m-Y') ?? '-' }}</dd>
 
-                    <dt class="col-sm-5">Petugas Penjemput</dt>
+                    <dt class="col-sm-5 text-muted">Petugas Penjemput</dt>
                     <dd class="col-sm-7">{{ $pickupRequest->officer?->name ?? '-' }}</dd>
 
-                    <dt class="col-sm-5">Dijadwalkan Oleh</dt>
+                    <dt class="col-sm-5 text-muted">Dijadwalkan Oleh</dt>
                     <dd class="col-sm-7">
                         @if($pickupRequest->scheduler)
                             {{ $pickupRequest->scheduler->name }} ({{ $pickupRequest->scheduled_at?->format('d-m-Y H:i') }})
@@ -76,16 +89,16 @@
                         @endif
                     </dd>
 
-                    <dt class="col-sm-5">Waktu Selesai</dt>
+                    <dt class="col-sm-5 text-muted">Waktu Selesai</dt>
                     <dd class="col-sm-7">{{ $pickupRequest->completed_at?->format('d-m-Y H:i') ?? '-' }}</dd>
 
-                    <dt class="col-sm-5">Alamat</dt>
+                    <dt class="col-sm-5 text-muted">Alamat</dt>
                     <dd class="col-sm-7">{!! nl2br(e($pickupRequest->address)) !!}</dd>
 
-                    <dt class="col-sm-5">Koordinat</dt>
-                    <dd class="col-sm-7">{{ $pickupRequest->latitude }}, {{ $pickupRequest->longitude }}</dd>
+                    <dt class="col-sm-5 text-muted">Koordinat</dt>
+                    <dd class="col-sm-7"><code>{{ $pickupRequest->latitude }}, {{ $pickupRequest->longitude }}</code></dd>
 
-                    <dt class="col-sm-5">Catatan Nasabah</dt>
+                    <dt class="col-sm-5 text-muted">Catatan Nasabah</dt>
                     <dd class="col-sm-7 mb-0">{{ $pickupRequest->notes ?: '-' }}</dd>
                 </dl>
             </div>
@@ -93,9 +106,11 @@
     </div>
 
     <div class="col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-semibold">Lokasi di Peta</div>
-            <div class="card-body">
+        <div class="card sk-card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-3">
+                <i class="bi bi-geo-alt text-success me-1"></i> Lokasi di Peta
+            </div>
+            <div class="card-body p-3 p-md-4">
                 <div id="admin-pickup-map" class="border"></div>
             </div>
         </div>
@@ -105,17 +120,17 @@
 @if($pickupRequest->status === \App\Models\PickupRequest::STATUS_MENUNGGU)
     <div class="row g-3">
         <div class="col-lg-6">
-            <div class="card shadow-sm border-primary h-100">
-                <div class="card-header bg-primary text-white fw-semibold">
+            <div class="card sk-card shadow-sm border-primary h-100">
+                <div class="card-header bg-primary text-white fw-semibold py-3">
                     <i class="bi bi-calendar-check"></i> Jadwalkan Penjemputan
                 </div>
-                <div class="card-body">
+                <div class="card-body p-3 p-md-4">
                     <form method="POST" action="{{ route('admin.penjemputan.schedule', $pickupRequest) }}" novalidate>
                         @csrf
                         @method('PATCH')
 
                         <div class="mb-3">
-                            <label for="scheduled_date" class="form-label">Tanggal Jadwal <span class="text-danger">*</span></label>
+                            <label for="scheduled_date" class="form-label fw-semibold">Tanggal Jadwal <span class="text-danger">*</span></label>
                             <input type="date" id="scheduled_date" name="scheduled_date"
                                    min="{{ now()->toDateString() }}"
                                    class="form-control @error('scheduled_date') is-invalid @enderror"
@@ -123,7 +138,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="officer_id" class="form-label">Pilih Petugas Aktif <span class="text-danger">*</span></label>
+                            <label for="officer_id" class="form-label fw-semibold">Pilih Petugas Aktif <span class="text-danger">*</span></label>
                             <select id="officer_id" name="officer_id" class="form-select @error('officer_id') is-invalid @enderror" required>
                                 <option value="">-- Pilih Petugas --</option>
                                 @foreach($activeOfficers as $officer)
@@ -141,17 +156,17 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card shadow-sm border-danger h-100">
-                <div class="card-header bg-danger text-white fw-semibold">
+            <div class="card sk-card shadow-sm border-danger h-100">
+                <div class="card-header bg-danger text-white fw-semibold py-3">
                     <i class="bi bi-x-circle"></i> Tolak Pengajuan
                 </div>
-                <div class="card-body">
+                <div class="card-body p-3 p-md-4">
                     <form method="POST" action="{{ route('admin.penjemputan.reject', $pickupRequest) }}" novalidate>
                         @csrf
                         @method('PATCH')
 
                         <div class="mb-3">
-                            <label for="rejection_reason" class="form-label">Alasan Penolakan <span class="text-danger">*</span></label>
+                            <label for="rejection_reason" class="form-label fw-semibold">Alasan Penolakan <span class="text-danger">*</span></label>
                             <textarea id="rejection_reason" name="rejection_reason" rows="3" maxlength="1000"
                                       class="form-control @error('rejection_reason') is-invalid @enderror"
                                       placeholder="Jelaskan alasan penolakan kepada nasabah..." required>{{ old('rejection_reason') }}</textarea>
@@ -164,17 +179,17 @@
         </div>
     </div>
 @elseif($pickupRequest->status === \App\Models\PickupRequest::STATUS_TERJADWAL)
-    <div class="card shadow-sm border-warning">
-        <div class="card-header bg-warning fw-semibold">
+    <div class="card sk-card shadow-sm border-warning">
+        <div class="card-header bg-warning fw-semibold py-3">
             <i class="bi bi-calendar2-week"></i> Ubah Jadwal / Petugas Penjemputan
         </div>
-        <div class="card-body">
+        <div class="card-body p-3 p-md-4">
             <form method="POST" action="{{ route('admin.penjemputan.reschedule', $pickupRequest) }}" class="row g-3 align-items-end" novalidate>
                 @csrf
                 @method('PATCH')
 
                 <div class="col-md-4">
-                    <label for="scheduled_date" class="form-label">Tanggal Jadwal Baru <span class="text-danger">*</span></label>
+                    <label for="scheduled_date" class="form-label fw-semibold">Tanggal Jadwal Baru <span class="text-danger">*</span></label>
                     <input type="date" id="scheduled_date" name="scheduled_date"
                            min="{{ now()->toDateString() }}"
                            class="form-control @error('scheduled_date') is-invalid @enderror"
@@ -182,7 +197,7 @@
                 </div>
 
                 <div class="col-md-5">
-                    <label for="officer_id" class="form-label">Petugas Aktif <span class="text-danger">*</span></label>
+                    <label for="officer_id" class="form-label fw-semibold">Petugas Aktif <span class="text-danger">*</span></label>
                     <select id="officer_id" name="officer_id" class="form-select @error('officer_id') is-invalid @enderror" required>
                         @foreach($activeOfficers as $officer)
                             <option value="{{ $officer->id }}" @selected((int) old('officer_id', $pickupRequest->officer_id) === $officer->id)>
@@ -202,13 +217,13 @@
 @endif
 
 @if($pickupRequest->deposits->isNotEmpty())
-    <div class="card shadow-sm mt-3">
-        <div class="card-header bg-white fw-semibold">
-            <i class="bi bi-receipt"></i> Daftar Bukti Setoran Hasil Penjemputan
+    <div class="card sk-card shadow-sm mt-3">
+        <div class="card-header bg-white fw-semibold py-3">
+            <i class="bi bi-receipt text-success me-1"></i> Daftar Bukti Setoran Hasil Penjemputan
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-sm align-middle mb-0">
+        <div class="card-body p-3 p-md-4">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table sk-table table-sm align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Kode Setoran</th>
@@ -234,6 +249,32 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="sk-mobile-list d-md-none">
+                @foreach($pickupRequest->deposits as $deposit)
+                    <div class="sk-mobile-card">
+                        <div class="sk-mobile-card__head">
+                            <code>{{ $deposit->code }}</code>
+                            <span class="fw-semibold text-success">Rp {{ number_format($deposit->total_value, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Jenis Sampah</span>
+                            <span class="sk-mobile-card__value">{{ $deposit->wasteType?->name }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Berat</span>
+                            <span class="sk-mobile-card__value">{{ number_format($deposit->weight, 3, ',', '.') }} {{ $deposit->wasteType?->unit }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Harga Snapshot</span>
+                            <span class="sk-mobile-card__value">Rp {{ number_format($deposit->price_per_unit, 2, ',', '.') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__actions">
+                            <a href="{{ route('admin.setoran.show', $deposit) }}" class="btn btn-sm btn-outline-primary w-100">Bukti</a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
