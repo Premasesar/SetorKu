@@ -6,29 +6,31 @@
     </div>
 @endif
 
-<div class="mb-3">
-    <label for="name" class="form-label">Nama Petugas <span class="text-danger">*</span></label>
-    <input type="text" id="name" name="name" maxlength="255"
-           class="form-control @error('name') is-invalid @enderror"
-           value="{{ old('name', $officer->name ?? '') }}" required>
-    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <label for="name" class="form-label fw-semibold">Nama Petugas <span class="text-danger">*</span></label>
+        <input type="text" id="name" name="name" maxlength="255"
+               class="form-control @error('name') is-invalid @enderror"
+               value="{{ old('name', $officer->name ?? '') }}" required>
+        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    <div class="col-md-6">
+        <label for="phone" class="form-label fw-semibold">No. HP <small class="text-muted fw-normal">(opsional)</small></label>
+        <input type="text" id="phone" name="phone" maxlength="30" placeholder="081234567890"
+               class="form-control @error('phone') is-invalid @enderror"
+               value="{{ old('phone', $officer->phone ?? '') }}">
+        @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
 </div>
 
 <div class="mb-3">
-    <label for="email" class="form-label">Email akun Google petugas <span class="text-danger">*</span></label>
+    <label for="email" class="form-label fw-semibold">Email akun Google petugas <span class="text-danger">*</span></label>
     <input type="email" id="email" name="email" maxlength="255" placeholder="nama.petugas@gmail.com"
            class="form-control @error('email') is-invalid @enderror"
            value="{{ old('email', $officer->email ?? '') }}" required>
     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
     <div class="form-text">Isi email akun Google petugas agar dapat langsung masuk melalui tombol Masuk dengan Google.</div>
-</div>
-
-<div class="mb-3">
-    <label for="phone" class="form-label">No. HP <small class="text-muted">(opsional)</small></label>
-    <input type="text" id="phone" name="phone" maxlength="30" placeholder="081234567890"
-           class="form-control @error('phone') is-invalid @enderror"
-           value="{{ old('phone', $officer->phone ?? '') }}">
-    @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
 @unless($isEdit)
