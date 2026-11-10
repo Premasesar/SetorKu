@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Rute Penjemputan')
 
@@ -31,15 +31,18 @@
 @endpush
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <div>
-        <h4 class="fw-bold mb-1"><i class="bi bi-signpost-split"></i> Optimasi Rute Penjemputan</h4>
-        <small class="text-muted">Hitung dan simpan urutan kunjungan penjemputan terjadwal (berangkat dan kembali ke {{ $depot['name'] }}).</small>
-    </div>
-    <a href="{{ route('admin.penjemputan.index') }}" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-truck"></i> Daftar Penjemputan
-    </a>
-</div>
+<x-page-hero
+    title="Optimasi Rute Penjemputan"
+    :subtitle="'Hitung dan simpan urutan kunjungan penjemputan terjadwal (berangkat dan kembali ke ' . $depot['name'] . ').'"
+    icon="bi-signpost-split"
+    :breadcrumbs="['Portal Admin', 'Optimasi Rute Penjemputan']"
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.penjemputan.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-truck"></i> Daftar Penjemputan
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="alert alert-secondary small mb-3">
     <i class="bi bi-info-circle-fill"></i>
@@ -47,15 +50,15 @@
 </div>
 
 {{-- Filter Tanggal & Petugas --}}
-<div class="card shadow-sm mb-3">
-    <div class="card-body">
+<div class="card sk-card shadow-sm mb-3">
+    <div class="card-body p-3 p-md-4">
         <form method="GET" action="{{ route('admin.rute.index') }}" class="row g-2 align-items-end">
             <div class="col-md-4">
-                <label for="date" class="form-label mb-1">Tanggal Jadwal Jemput</label>
+                <label for="date" class="form-label fw-semibold mb-1">Tanggal Jadwal Jemput</label>
                 <input type="date" id="date" name="date" value="{{ $selectedDate }}" class="form-control" required>
             </div>
             <div class="col-md-5">
-                <label for="officer_id" class="form-label mb-1">Petugas Aktif</label>
+                <label for="officer_id" class="form-label fw-semibold mb-1">Petugas Aktif</label>
                 <select id="officer_id" name="officer_id" class="form-select" required>
                     <option value="">-- Pilih Petugas --</option>
                     @foreach($officers as $officer)
@@ -77,13 +80,13 @@
 @if($calculation !== null)
     {{-- Daftar titik yang dikecualikan --}}
     @if(!empty($calculation['excluded']))
-        <div class="card border-warning shadow-sm mb-3">
-            <div class="card-header bg-warning-subtle fw-semibold text-dark">
+        <div class="card sk-card border-warning shadow-sm mb-3">
+            <div class="card-header bg-warning-subtle fw-semibold text-dark py-3">
                 <i class="bi bi-exclamation-triangle-fill"></i> Titik Dikecualikan dari Perhitungan ({{ count($calculation['excluded']) }})
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table sk-table table-sm align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-3">Kode</th>
@@ -103,6 +106,25 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <div class="sk-mobile-list d-md-none p-3">
+                    @foreach($calculation['excluded'] as $item)
+                        <div class="sk-mobile-card">
+                            <div class="sk-mobile-card__head">
+                                <code>{{ $item['stop']['code'] ?? '-' }}</code>
+                                <span class="fw-semibold">{{ $item['stop']['customer_name'] ?? '-' }}</span>
+                            </div>
+                            <div class="sk-mobile-card__row">
+                                <span class="sk-mobile-card__label">Koordinat Mentah</span>
+                                <span class="sk-mobile-card__value"><code>{{ $item['stop']['latitude'] ?? 'null' }}, {{ $item['stop']['longitude'] ?? 'null' }}</code></span>
+                            </div>
+                            <div class="sk-mobile-card__row">
+                                <span class="sk-mobile-card__label">Alasan Dikecualikan</span>
+                                <span class="sk-mobile-card__value text-danger">{{ $item['reason'] }}</span>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -128,7 +150,7 @@
         {{-- Ringkasan 3 Total Jarak & Persentase Penghematan --}}
         <div class="row g-3 mb-3">
             <div class="col-md-3">
-                <div class="card shadow-sm h-100">
+                <div class="card sk-card shadow-sm h-100">
                     <div class="card-body">
                         <div class="text-muted small">Urutan Awal (Waktu Masuk)</div>
                         <h4 class="fw-bold mt-1 mb-0">{{ number_format($calculation['initial_distance_km'], 2, ',', '.') }} km</h4>
@@ -136,7 +158,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card shadow-sm h-100 border-primary">
+                <div class="card sk-card shadow-sm h-100 border-primary">
                     <div class="card-body">
                         <div class="text-muted small">Hasil Nearest Neighbor</div>
                         <h4 class="fw-bold text-primary mt-1 mb-0">{{ number_format($calculation['nn_distance_km'], 2, ',', '.') }} km</h4>
@@ -144,7 +166,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card shadow-sm h-100 border-success">
+                <div class="card sk-card shadow-sm h-100 border-success">
                     <div class="card-body">
                         <div class="text-muted small">Hasil Nearest Neighbor + 2-Opt</div>
                         <h4 class="fw-bold text-success mt-1 mb-0">{{ number_format($calculation['two_opt_distance_km'], 2, ',', '.') }} km</h4>
@@ -152,7 +174,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card shadow-sm h-100 bg-success-subtle border-success">
+                <div class="card sk-card shadow-sm h-100 bg-success-subtle border-success">
                     <div class="card-body">
                         <div class="text-muted small">Penghematan vs Urutan Awal</div>
                         <h4 class="fw-bold text-success mt-1 mb-0">{{ number_format($calculation['savings_percent'], 2, ',', '.') }}%</h4>
@@ -177,23 +199,23 @@
         </div>
 
         {{-- Peta Leaflet Rute Tertutup --}}
-        <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white fw-semibold">
-                <i class="bi bi-map"></i> Peta Rute Penjemputan Tertutup ({{ $depot['name'] }})
+        <div class="card sk-card shadow-sm mb-3">
+            <div class="card-header bg-white fw-semibold py-3">
+                <i class="bi bi-map text-success me-1"></i> Peta Rute Penjemputan Tertutup ({{ $depot['name'] }})
             </div>
-            <div class="card-body">
+            <div class="card-body p-3 p-md-4">
                 <div id="admin-route-map" class="rounded border" style="height: 400px;"></div>
             </div>
         </div>
 
         {{-- Tabel Urutan Kunjungan --}}
-        <div class="card shadow-sm">
-            <div class="card-header bg-white fw-semibold">
-                <i class="bi bi-list-ol"></i> Tabel Urutan Rute Penjemputan
+        <div class="card sk-card shadow-sm">
+            <div class="card-header bg-white fw-semibold py-3">
+                <i class="bi bi-list-ol text-success me-1"></i> Tabel Urutan Rute Penjemputan
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table sk-table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-3">No.</th>
@@ -224,7 +246,7 @@
                                         </a>
                                     </td>
                                     <td>
-                                        {{ $stop['customer_name'] }}
+                                        <span class="fw-semibold">{{ $stop['customer_name'] }}</span>
                                         <br><small class="text-muted">{{ $stop['customer_code'] }}</small>
                                     </td>
                                     <td>{{ $stop['address'] }}</td>
@@ -242,6 +264,79 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Mobile Card View (<768px) --}}
+                <div class="sk-mobile-list d-md-none p-3">
+                    <div class="sk-mobile-card border-primary">
+                        <div class="sk-mobile-card__head">
+                            <div>
+                                <span class="badge bg-primary me-1">0</span>
+                                <code>DEPOT</code>
+                            </div>
+                            <span class="fw-semibold">{{ $depot['name'] }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Alamat</span>
+                            <span class="sk-mobile-card__value">Titik Keberangkatan ({{ number_format($depot['lat'], 6) }}, {{ number_format($depot['lng'], 6) }})</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Jarak Kumulatif (km)</span>
+                            <span class="sk-mobile-card__value">0,00</span>
+                        </div>
+                    </div>
+
+                    @foreach($calculation['ordered_stops'] as $stop)
+                        <div class="sk-mobile-card">
+                            <div class="sk-mobile-card__head">
+                                <div>
+                                    <span class="badge bg-success me-1">{{ $stop['sequence'] }}</span>
+                                    <a href="{{ route('admin.penjemputan.show', $stop['id']) }}">
+                                        <code>{{ $stop['code'] }}</code>
+                                    </a>
+                                </div>
+                                <span class="fw-semibold">{{ $stop['customer_name'] }}</span>
+                            </div>
+                            <div class="sk-mobile-card__row">
+                                <span class="sk-mobile-card__label">Kode Nasabah</span>
+                                <span class="sk-mobile-card__value">{{ $stop['customer_code'] }}</span>
+                            </div>
+                            <div class="sk-mobile-card__row">
+                                <span class="sk-mobile-card__label">Alamat</span>
+                                <span class="sk-mobile-card__value">{{ $stop['address'] }}</span>
+                            </div>
+                            <div class="sk-mobile-card__row">
+                                <span class="sk-mobile-card__label">Jarak Sebelumnya (km)</span>
+                                <span class="sk-mobile-card__value">{{ number_format($stop['leg_distance_km'], 2, ',', '.') }}</span>
+                            </div>
+                            <div class="sk-mobile-card__row">
+                                <span class="sk-mobile-card__label">Jarak Kumulatif (km)</span>
+                                <span class="sk-mobile-card__value fw-semibold">{{ number_format($stop['cumulative_distance_km'], 2, ',', '.') }}</span>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <div class="sk-mobile-card bg-light">
+                        <div class="sk-mobile-card__head">
+                            <div>
+                                <span class="badge bg-primary me-1">0</span>
+                                <code>DEPOT</code>
+                            </div>
+                            <span class="fw-semibold">{{ $depot['name'] }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Alamat</span>
+                            <span class="sk-mobile-card__value">Kembali ke Bank Sampah (Rute Tertutup)</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Jarak Sebelumnya (km)</span>
+                            <span class="sk-mobile-card__value">{{ number_format($calculation['return_leg_km'], 2, ',', '.') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Jarak Kumulatif (km)</span>
+                            <span class="sk-mobile-card__value fw-bold text-success">{{ number_format($calculation['two_opt_distance_km'], 2, ',', '.') }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
