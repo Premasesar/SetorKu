@@ -1,23 +1,26 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Dampak Pengelolaan Sampah')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <div>
-        <h4 class="fw-bold mb-1"><i class="bi bi-bar-chart-line"></i> Dampak Pengelolaan Sampah</h4>
-        <small class="text-muted">Ringkasan seluruh waktu berdasarkan data setoran nyata yang tersimpan di sistem.</small>
-    </div>
-    <a href="{{ route('admin.laporan.index') }}" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-journal-text"></i> Laporan Bulanan
-    </a>
-</div>
+<x-page-hero
+    title="Dampak Pengelolaan Sampah"
+    subtitle="Ringkasan seluruh waktu berdasarkan data setoran nyata yang tersimpan di sistem."
+    icon="bi-bar-chart-line"
+    :breadcrumbs="['Portal Admin', 'Dampak Pengelolaan Sampah']"
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.laporan.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-journal-text"></i> Laporan Bulanan
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Kartu Metrik Utama Seluruh Waktu --}}
 <div class="row g-3 mb-4">
     <div class="col-md-4">
-        <div class="card border-success shadow-sm h-100">
-            <div class="card-body">
+        <div class="card sk-card border-success shadow-sm h-100">
+            <div class="card-body p-3 p-md-4">
                 <div class="text-muted small">Total Sampah Terkelola (Seluruh Waktu)</div>
                 <h3 class="fw-bold text-success mt-1 mb-0">
                     {{ number_format($impact['total_weight_kg'], 3, ',', '.') }} kg
@@ -27,8 +30,8 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card border-primary shadow-sm h-100">
-            <div class="card-body">
+        <div class="card sk-card border-primary shadow-sm h-100">
+            <div class="card-body p-3 p-md-4">
                 <div class="text-muted small">Total Nilai Setoran (Seluruh Waktu)</div>
                 <h3 class="fw-bold text-primary mt-1 mb-0">
                     Rp {{ number_format($impact['total_deposit_value'], 2, ',', '.') }}
@@ -37,8 +40,8 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
+        <div class="card sk-card shadow-sm h-100">
+            <div class="card-body p-3 p-md-4">
                 <div class="text-muted small">Jumlah Nasabah Aktif</div>
                 <h3 class="fw-bold mt-1 mb-0">{{ $impact['active_customers_count'] }}</h3>
                 <div class="small text-muted mt-1">Nasabah berstatus aktif</div>
@@ -48,11 +51,11 @@
 </div>
 
 {{-- Grafik Batang 12 Bulan Terakhir --}}
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-white fw-semibold">
-        <i class="bi bi-bar-chart"></i> Grafik Berat Sampah Terkelola per Bulan (12 Bulan Terakhir)
+<div class="card sk-card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold py-3">
+        <i class="bi bi-bar-chart text-success me-1"></i> Grafik Berat Sampah Terkelola per Bulan (12 Bulan Terakhir)
     </div>
-    <div class="card-body">
+    <div class="card-body p-3 p-md-4">
         <div style="height: 300px;">
             <canvas id="monthlyWeightBarChart"></canvas>
         </div>
@@ -60,13 +63,13 @@
 </div>
 
 {{-- Tabel Per Jenis Sampah --}}
-<div class="card shadow-sm">
-    <div class="card-header bg-white fw-semibold">
-        <i class="bi bi-table"></i> Komposisi Sampah Terkelola per Jenis Sampah
+<div class="card sk-card shadow-sm">
+    <div class="card-header bg-white fw-semibold py-3">
+        <i class="bi bi-table text-success me-1"></i> Komposisi Sampah Terkelola per Jenis Sampah
     </div>
     <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive d-none d-md-block">
+            <table class="table sk-table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
                         <th class="ps-3">Jenis Sampah</th>
@@ -98,6 +101,43 @@
                     </tr>
                 </tfoot>
             </table>
+        </div>
+
+        {{-- Mobile Card View (<768px) --}}
+        <div class="sk-mobile-list d-md-none p-3">
+            @forelse($impact['by_waste_type'] as $row)
+                <div class="sk-mobile-card">
+                    <div class="sk-mobile-card__head">
+                        <span class="fw-bold">{{ $row->name }}</span>
+                        <span class="badge bg-success-subtle text-success">{{ number_format($row->percentage, 2, ',', '.') }}%</span>
+                    </div>
+                    <div class="sk-mobile-card__row">
+                        <span class="sk-mobile-card__label">Jumlah Setoran</span>
+                        <span class="sk-mobile-card__value">{{ $row->deposits_count }}</span>
+                    </div>
+                    <div class="sk-mobile-card__row">
+                        <span class="sk-mobile-card__label">Total Berat (kg)</span>
+                        <span class="sk-mobile-card__value fw-semibold">{{ number_format($row->total_weight_kg, 3, ',', '.') }}</span>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center text-muted py-3">Belum ada jenis sampah terdaftar.</div>
+            @endforelse
+
+            <div class="sk-mobile-card bg-light">
+                <div class="sk-mobile-card__head">
+                    <span class="fw-bold">Total</span>
+                    <span class="fw-bold text-success">{{ $impact['total_weight_kg'] > 0 ? '100,00%' : '0,00%' }}</span>
+                </div>
+                <div class="sk-mobile-card__row">
+                    <span class="sk-mobile-card__label">Jumlah Setoran</span>
+                    <span class="sk-mobile-card__value fw-semibold">{{ $impact['total_deposits_count'] }}</span>
+                </div>
+                <div class="sk-mobile-card__row">
+                    <span class="sk-mobile-card__label">Total Berat (kg)</span>
+                    <span class="sk-mobile-card__value fw-semibold">{{ number_format($impact['total_weight_kg'], 3, ',', '.') }}</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>

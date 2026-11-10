@@ -1,15 +1,24 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Kelola Penjemputan Sampah')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h4 class="fw-bold mb-0"><i class="bi bi-truck"></i> Kelola Penjemputan Sampah</h4>
-</div>
+<x-page-hero
+    title="Kelola Penjemputan Sampah"
+    subtitle="Verifikasi pengajuan penjemputan sampah nasabah, penjadwalan petugas lapangan, dan pemantauan status."
+    icon="bi-truck"
+    :breadcrumbs="['Portal Admin', 'Kelola Penjemputan Sampah']"
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.rute.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-signpost-split"></i> Optimasi Rute
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <form method="GET" action="{{ route('admin.penjemputan.index') }}" class="row g-2 mb-3">
+<div class="card sk-card shadow-sm">
+    <div class="card-body p-3 p-md-4">
+        <form method="GET" action="{{ route('admin.penjemputan.index') }}" class="row g-2 mb-3 align-items-center">
             <div class="col-md-4">
                 <input type="text" name="q" value="{{ $search }}" class="form-control"
                        placeholder="Cari kode JMP atau nama nasabah...">
@@ -25,7 +34,7 @@
             <div class="col-md-3">
                 <input type="date" name="date" value="{{ $date }}" class="form-control" title="Filter tanggal pengajuan/jadwal">
             </div>
-            <div class="col-auto">
+            <div class="col-auto d-flex gap-2">
                 <button type="submit" class="btn btn-outline-success"><i class="bi bi-funnel"></i> Filter</button>
                 @if($status !== '' || $date !== '' || $search !== '')
                     <a href="{{ route('admin.penjemputan.index') }}" class="btn btn-outline-secondary">Reset</a>
@@ -34,13 +43,13 @@
         </form>
 
         @if($pickups->isEmpty())
-            <div class="text-center text-muted py-5">
-                <i class="bi bi-truck fs-1"></i>
-                <p class="mt-2 mb-0">Tidak ada data penjemputan yang ditemukan.</p>
-            </div>
+            <x-empty-state
+                icon="bi-truck"
+                message="Tidak ada data penjemputan yang ditemukan."
+            />
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table sk-table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Kode</th>
@@ -57,7 +66,7 @@
                             <tr>
                                 <td><code>{{ $pickup->code }}</code></td>
                                 <td>
-                                    {{ $pickup->customer?->name }}
+                                    <span class="fw-semibold">{{ $pickup->customer?->name }}</span>
                                     <br><small class="text-muted">{{ $pickup->customer?->code }}</small>
                                 </td>
                                 <td>{{ $pickup->requested_date?->format('d-m-Y') }}</td>
@@ -75,7 +84,40 @@
                 </table>
             </div>
 
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            {{-- Mobile Card View (<768px) --}}
+            <div class="sk-mobile-list d-md-none mb-3">
+                @foreach($pickups as $pickup)
+                    <div class="sk-mobile-card">
+                        <div class="sk-mobile-card__head">
+                            <div>
+                                <code>{{ $pickup->code }}</code>
+                                <div class="fw-bold mt-1">{{ $pickup->customer?->name }}</div>
+                                <small class="text-muted">{{ $pickup->customer?->code }}</small>
+                            </div>
+                            <span class="badge {{ $pickup->statusBadgeClass() }}">{{ $pickup->statusLabel() }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Tgl Pengajuan</span>
+                            <span class="sk-mobile-card__value">{{ $pickup->requested_date?->format('d-m-Y') }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Tgl Jadwal</span>
+                            <span class="sk-mobile-card__value">{{ $pickup->scheduled_date?->format('d-m-Y') ?? '-' }}</span>
+                        </div>
+                        <div class="sk-mobile-card__row">
+                            <span class="sk-mobile-card__label">Petugas</span>
+                            <span class="sk-mobile-card__value">{{ $pickup->officer?->name ?? '-' }}</span>
+                        </div>
+                        <div class="sk-mobile-card__actions">
+                            <a href="{{ route('admin.penjemputan.show', $pickup) }}" class="btn btn-sm btn-outline-primary w-100">
+                                Detail & Kelola
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-2 border-top">
                 <small class="text-muted">
                     Menampilkan {{ $pickups->firstItem() }}–{{ $pickups->lastItem() }} dari {{ $pickups->total() }} penjemputan
                 </small>

@@ -1,25 +1,31 @@
-@extends('layouts.app')
+@extends('layouts.ui-staff')
 
 @section('title', 'Detail Petugas')
 
 @section('content')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+<nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb mb-0">
         <li class="breadcrumb-item"><a href="{{ route('admin.petugas.index') }}">Kelola Petugas</a></li>
         <li class="breadcrumb-item active">{{ $officer->name }}</li>
     </ol>
 </nav>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h4 class="fw-bold mb-0">
-        <i class="bi bi-person-badge"></i> {{ $officer->name }}
+<x-page-hero
+    :title="$officer->name"
+    :subtitle="'Detail akun petugas operasional (' . $officer->officer_code . '), status keaktifan, serta pengaturan ulang password.'"
+    icon="bi-person-badge"
+    :breadcrumbs="[
+        ['label' => 'Portal Admin'],
+        ['label' => 'Kelola Petugas', 'url' => route('admin.petugas.index')],
+        ['label' => $officer->name],
+    ]"
+>
+    <x-slot:actions>
         @if($officer->is_active)
             <span class="badge bg-success fs-6 align-middle">Aktif</span>
         @else
             <span class="badge bg-secondary fs-6 align-middle">Nonaktif</span>
         @endif
-    </h4>
-    <div class="d-flex gap-2">
         <a href="{{ route('admin.petugas.edit', $officer) }}" class="btn btn-outline-secondary">
             <i class="bi bi-pencil"></i> Ubah Data
         </a>
@@ -38,31 +44,33 @@
                 <button type="submit" class="btn btn-success"><i class="bi bi-person-check"></i> Aktifkan</button>
             </form>
         @endif
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="row g-3">
     <div class="col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-semibold">Informasi Akun Petugas</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Kode</dt>
+        <div class="card sk-card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-3">
+                <i class="bi bi-person-vcard text-success me-1"></i> Informasi Akun Petugas
+            </div>
+            <div class="card-body p-3 p-md-4">
+                <dl class="row mb-0 g-2">
+                    <dt class="col-sm-4 text-muted">Kode</dt>
                     <dd class="col-sm-8"><code>{{ $officer->officer_code }}</code></dd>
 
-                    <dt class="col-sm-4">Nama</dt>
-                    <dd class="col-sm-8">{{ $officer->name }}</dd>
+                    <dt class="col-sm-4 text-muted">Nama</dt>
+                    <dd class="col-sm-8 fw-semibold">{{ $officer->name }}</dd>
 
-                    <dt class="col-sm-4">Email</dt>
+                    <dt class="col-sm-4 text-muted">Email</dt>
                     <dd class="col-sm-8">{{ $officer->email }}</dd>
 
-                    <dt class="col-sm-4">No. HP</dt>
+                    <dt class="col-sm-4 text-muted">No. HP</dt>
                     <dd class="col-sm-8">{{ $officer->phone ?: '-' }}</dd>
 
-                    <dt class="col-sm-4">Peran</dt>
+                    <dt class="col-sm-4 text-muted">Peran</dt>
                     <dd class="col-sm-8"><span class="badge badge-petugas">Petugas</span></dd>
 
-                    <dt class="col-sm-4">Terdaftar</dt>
+                    <dt class="col-sm-4 text-muted">Terdaftar</dt>
                     <dd class="col-sm-8 mb-0">{{ $officer->created_at?->format('d-m-Y H:i') }}</dd>
                 </dl>
             </div>
@@ -70,9 +78,11 @@
     </div>
 
     <div class="col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-semibold"><i class="bi bi-key"></i> Reset Password Petugas</div>
-            <div class="card-body">
+        <div class="card sk-card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-3">
+                <i class="bi bi-key text-warning me-1"></i> Reset Password Petugas
+            </div>
+            <div class="card-body p-3 p-md-4">
                 <form method="POST" action="{{ route('admin.petugas.reset-password', $officer) }}" novalidate>
                     @csrf
                     @method('PATCH')
