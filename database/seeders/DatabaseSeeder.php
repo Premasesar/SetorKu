@@ -6,19 +6,33 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 
 /**
- * Seeder akun, nasabah Yogyakarta, jenis sampah, & 12 penjemputan SetorKu.
+ * Seeder akun, master jenis sampah, & data operasional SetorKu.
  *
- * Idempoten: aman dijalankan berulang tanpa migrate:fresh.
+ * Pada lingkungan local/testing:
+ * - Menyiapkan akun demo default (admin@banksampah.test, petugas, nasabah Yogyakarta).
+ * - Menyiapkan 12 data penjemputan contoh (PickupRequestSeeder).
  *
- * Akun utama:
- * - admin@banksampah.test / password (role: admin)
- * - petugas@banksampah.test / password (role: petugas — Petugas Satu)
- * - petugas2@banksampah.test / password (role: petugas — Petugas Dua)
- * - nasabah1@banksampah.test s.d. nasabah11@banksampah.test / password (role: nasabah + koordinat Yogyakarta)
+ * Pada lingkungan production:
+ * - HANYA membuat admin pertama jika SEED_ADMIN_EMAIL diset (bukan default @banksampah.test).
+ * - Akun admin dibuat TANPA password lokal (password: null) agar autentikasi hanya melalui Google OAuth.
+ * - TIDAK ada kredensial atau akun default yang dibuat (tidak ada petugas/nasabah dummy, tidak ada demo penjemputan).
+ * - Master jenis sampah (WasteTypeSeeder) tetap dijalankan agar bank sampah siap beroperasi.
  */
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
+    {
+        if (app()->environment('local', 'testing')) {
+            $this->seedLocalDemo();
+        } else {
+            $this->seedProduction();
+        }
+    }
+
+    /**
+     * Seeder untuk lingkungan lokal dan testing dengan akun demo lengkap.
+     */
+    protected function seedLocalDemo(): void
     {
         $adminEmail = mb_strtolower(trim((string) (config('setorku.seed_admin_email') ?: env('SEED_ADMIN_EMAIL', 'admin@banksampah.test'))));
         if ($adminEmail === '') {
@@ -82,6 +96,43 @@ class DatabaseSeeder extends Seeder
         $this->call(WasteTypeSeeder::class);
         $this->call(PickupRequestSeeder::class);
 
-        $this->command?->info('Selesai seed akun, 2 petugas, 11 nasabah Yogyakarta, jenis sampah, dan 12 penjemputan.');
+        $this->command?->info('Selesai seed akun demo, 2 petugas, 11 nasabah Yogyakarta, jenis sampah, dan 12 penjemputan.');
+    }
+
+    /**
+     * Seeder untuk lingkungan production:
+     * - Hanya membuat admin awal jika SEED_ADMIN_EMAIL diisi (dan bukan domain placeholder .test).
+     * - Admin dibuat tanpa password (password null) agar hanya bisa login via Google OAuth.
+     * - Tidak membuat akun default petugas/nasabah ataupun data penjemputan demo.
+     * - Master data jenis sampah tetap disiapkan agar operasional bank sampah siap berjalan.
+     */
+    protected function seedProduction(): void
+    {
+        $rawEmail = config('setorku.seed_admin_email') ?: env('SEED_ADMIN_EMAIL');
+        $adminEmail = mb_strtolower(trim((string) $rawEmail));
+
+        if ($adminEmail !== '' && !str_ends_with($adminEmail, '@banksampah.test')) {
+            $user = User::firstOrCreate(
+                ['email' => $adminEmail],
+                [
+                    'name' => 'Admin Bank Sampah',
+                    'password' => null, // Password null: hanya bisa login via Google OAuth (tidak ada default password)
+                    'role' => 'admin',
+                ],
+            );
+
+            if ($user->role !== 'admin') {
+                $user->update(['role' => 'admin']);
+            }
+
+            $this->command?->info("Admin production disiapkan: {$adminEmail} (login via Google OAuth, tanpa default password).");
+        } else {
+            $this->command?->warn('PERINGATAN PRODUCTION: SEED_ADMIN_EMAIL belum dikonfigurasi dengan email valid di .env. Akun admin bawaan TIDAK dibuat.');
+        }
+
+        // Master jenis sampah tetap dijalankan agar sistem operasional
+        $this->call(WasteTypeSeeder::class);
+
+        $this->command?->info('Selesai inisialisasi master data production. Tidak ada akun demo atau penjemputan contoh yang dibuat.');
     }
 }

@@ -24,7 +24,9 @@ return [
     |
     | Memungkinkan pemilik proyek mengisi Gmail aslinya di SEED_ADMIN_EMAIL
     | agar akun Admin langsung cocok saat login menggunakan Google.
+    | Pada environment production, hanya email ini yang akan di-seed sebagai
+    | admin pertama (tanpa password lokal).
     |
     */
-    'seed_admin_email' => env('SEED_ADMIN_EMAIL', 'admin@banksampah.test'),
+    'seed_admin_email' => env('SEED_ADMIN_EMAIL'),
 ];

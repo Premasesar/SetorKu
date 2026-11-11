@@ -1,0 +1,14 @@
+.git
+.github
+.gemini
+.env
+.env.*
+!.env.production.example
+node_modules
+vendor
+tests
+docs
+*.md
+.phpunit.result.cache
+storage/*.key
+storage/logs/*.log
