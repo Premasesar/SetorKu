@@ -1,13 +1,14 @@
 # Dockerfile untuk SetorKu (Laravel 11 + PHP 8.3 Apache)
-# Opsi deployment Docker mandiri tanpa mengubah alur kerja lokal.
+# Mendukung port dinamis $PORT dari Render (default 10000) dan database eksternal TLS (TiDB Cloud).
 
 FROM php:8.3-apache
 
-# 1. Pasang paket sistem yang dibutuhkan
+# 1. Pasang paket sistem yang dibutuhkan (termasuk ca-certificates untuk koneksi TLS database)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     unzip \
+    ca-certificates \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -16,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzip-dev \
     libicu-dev \
     default-mysql-client \
+    && update-ca-certificates \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo_mysql \
@@ -51,8 +53,13 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 9. Buka port 80
-EXPOSE 80
+# 9. Siapkan entrypoint script
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# 10. Jalankan Apache di foreground
-CMD ["apache2-foreground"]
+# 10. Port dinamis (Render memberikan PORT, default 10000)
+ENV PORT=10000
+EXPOSE 10000
+
+# 11. Jalankan entrypoint script otomatis
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

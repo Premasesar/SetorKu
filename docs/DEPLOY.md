@@ -265,9 +265,9 @@ Simpan konfigurasi di `/etc/apache2/sites-available/setorku.conf`:
 
 ## 7. Opsi Deployment Menggunakan Docker
 
-Bagi pengguna Docker, SetorKu menyediakan `Dockerfile` berbasis `php:8.3-apache` yang siap pakai.
+Bagi pengguna Docker, SetorKu menyediakan `Dockerfile` berbasis `php:8.3-apache` yang siap pakai. Image ini mendukung konfigurasi port dinamis via environment variable `PORT` (default `10000`) dan otomatis menjalankan migrasi serta seeder produksi melalui `docker/entrypoint.sh`.
 
-### Build & Menjalankan Kontainer:
+### Build & Menjalankan Kontainer Lokal:
 
 ```bash
 # 1. Build image Docker
@@ -276,17 +276,87 @@ docker build -t setorku:latest .
 # 2. Jalankan container
 docker run -d \
   --name setorku-app \
-  -p 8080:80 \
+  -p 10000:10000 \
+  -e PORT=10000 \
   --env-file .env \
-  -v setorku_storage:/var/www/html/storage \
   setorku:latest
 ```
 
-Jika berada di belakang Nginx/Traefik reverse proxy pada host, arahkan traffic HTTPS port 443 ke port kontainer `8080`.
+---
+
+## 8. Panduan Deployment Render (Docker Free Tier) + TiDB Cloud Starter
+
+Panduan ini ditujukan untuk menggelar SetorKu di **Render Web Service (Free Tier)** menggunakan runtime **Docker** dan database eksternal **TiDB Cloud Starter** (MySQL-compatible dengan enkripsi TLS wajib).
+
+### Karakteristik Lingkungan Render + TiDB:
+- **Port Dinamis**: Render menginjeksi environment variable `PORT` (biasanya `10000`). Script `docker/entrypoint.sh` otomatis menyesuaikan konfigurasi Apache (`ports.conf` dan `000-default.conf`) ke port tersebut.
+- **Eksekusi Otomatis (Tanpa Akses Shell)**: Paket Free Render umumnya tidak menyediakan SSH/web shell interaktif. Saat container dimulai, `docker/entrypoint.sh` secara otomatis menjalankan:
+  1. `php artisan config:cache`, `route:cache`, `view:cache`
+  2. `php artisan migrate --force`
+  3. `php artisan db:seed --force` (idempoten: hanya membuat jenis sampah master dan admin dari `SEED_ADMIN_EMAIL`)
+  4. Memulai Apache di foreground
+- **Wajib TLS di TiDB Cloud**: TiDB Cloud mewajibkan koneksi SSL/TLS. Paket `ca-certificates` telah dipasang di dalam image Docker Debian, sehingga path bundle CA adalah `/etc/ssl/certs/ca-certificates.crt`.
+- **Log Streaming ke Render**: Dengan menyetel `LOG_CHANNEL=stderr`, seluruh log sistem langsung dialirkan ke tab **Logs** di dashboard Render secara real-time.
+
+### Langkah 1: Buat Kunci Aplikasi (`APP_KEY`)
+Jalankan perintah ini di komputer lokal untuk menghasilkan string kunci enkripsi 32-karakter base64:
+
+```bash
+php artisan key:generate --show
+```
+*Salin seluruh string output (termasuk awalan `base64:...`) untuk diisikan ke variabel `APP_KEY` di Render.*
+
+### Langkah 2: Buat Database di TiDB Cloud
+1. Masuk ke [TiDB Cloud Console](https://tidbcloud.com/) dan buat cluster **Starter (Serverless)**.
+2. Catat informasi koneksi:
+   - **Host**: misal `gateway01.ap-southeast-1.prod.aws.tidbcloud.com`
+   - **Port**: `4000` (port bawaan TiDB)
+   - **Database**: `setorku`
+   - **Username**: format biasanya `<prefix>.root`
+   - **Password**: password yang Anda buat saat inisialisasi cluster
+
+### Langkah 3: Deploy di Render (Web Service)
+1. Buka [Render Dashboard](https://dashboard.render.com/) -> **New +** -> **Web Service**.
+2. Hubungkan repositori GitHub `Premasesar/SetorKu`.
+3. Pilih **Runtime**: `Docker`.
+4. Pilih **Plan**: `Free`.
+5. Masuk ke tab **Environment Variables** dan tambahkan variabel berikut:
+
+| Environment Variable | Nilai yang Harus Diisi |
+|---|---|
+| `APP_NAME` | `SetorKu` |
+| `APP_ENV` | `production` |
+| `APP_DEBUG` | `false` |
+| `APP_KEY` | *(hasil `php artisan key:generate --show`, format `base64:...`)* |
+| `APP_URL` | `https://<nama-app-anda>.onrender.com` |
+| `LOG_CHANNEL` | `stderr` |
+| `DB_CONNECTION` | `mysql` |
+| `DB_HOST` | *(Host TiDB Cloud Anda)* |
+| `DB_PORT` | `4000` |
+| `DB_DATABASE` | `setorku` |
+| `DB_USERNAME` | *(Username TiDB Cloud)* |
+| `DB_PASSWORD` | *(Password TiDB Cloud)* |
+| `DB_SSL_CA` | `/etc/ssl/certs/ca-certificates.crt` |
+| `SESSION_DRIVER` | `database` |
+| `SESSION_SECURE_COOKIE` | `true` |
+| `GOOGLE_CLIENT_ID` | *(Client ID dari Google Cloud Console)* |
+| `GOOGLE_CLIENT_SECRET` | *(Client Secret dari Google Cloud Console)* |
+| `GOOGLE_REDIRECT_URI` | `https://<nama-app-anda>.onrender.com/auth/google/callback` |
+| `SEED_ADMIN_EMAIL` | *(Email Google Admin Utama Anda)* |
+| `BANK_SAMPAH_NAME` | `"Bank Sampah SetorKu Yogyakarta"` |
+| `BANK_SAMPAH_LAT` | `-7.7970680` |
+| `BANK_SAMPAH_LNG` | `110.3705290` |
+
+*(Opsi Blueprint: Anda juga dapat menggunakan file `render.yaml` yang disertakan di repository dengan memilih menu **New +** -> **Blueprint** di Render).*
+
+### Catatan Kompatibilitas TiDB:
+- **Pessimistic Locking (`lockForUpdate`)**: TiDB Cloud secara default menggunakan model transaksi *pessimistic* (`tidb_txn_mode = 'pessimistic'`). Pemanggilan `Customer::whereKey(...)->lockForUpdate()` pada `DepositService` dan `WithdrawalService` kompatibel penuh dengan InnoDB MySQL.
+- **Auto-Increment ID**: TiDB mengalokasikan batch auto-increment secara terdistribusi. ID transaksi tetap unik dan monoton naik, sehingga format kode (`STR-%04d`, `TRK-%04d`, `JMP-%04d`, `NSB-%04d`) berfungsi normal.
+- **Foreign Keys**: TiDB Cloud Serverless (v7.1+) mendukung integritas referensial foreign key (`restrictOnDelete` dan `nullOnDelete`).
 
 ---
 
-## 8. Verifikasi Pasca-Deployment (Post-Deployment Checklist)
+## 9. Verifikasi Pasca-Deployment (Post-Deployment Checklist)
 
 Setelah menjalankan langkah-langkah di atas, lakukan verifikasi:
 
